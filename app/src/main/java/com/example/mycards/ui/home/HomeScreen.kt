@@ -34,6 +34,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.lazy.rememberLazyListState
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import com.example.mycards.data.model.CardEntity
 import com.example.mycards.utils.BrandHelper
 import com.example.mycards.utils.ShortcutHelper
@@ -138,22 +142,49 @@ fun HomeScreen(
                     onAddClick = { showAddDialog = true }
                 )
             } else {
+                var list by remember { mutableStateOf(filteredCards) }
+                
+                LaunchedEffect(filteredCards) {
+                    list = filteredCards
+                }
+
+                val lazyListState = rememberLazyListState()
+                val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
+                    list = list.toMutableList().apply {
+                        add(to.index, removeAt(from.index))
+                    }
+                }
+
+                // Quando l'utente smette di trascinare, salviamo l'ordine
+                LaunchedEffect(reorderableState.isAnyItemDragging) {
+                    if (!reorderableState.isAnyItemDragging && list != filteredCards) {
+                        viewModel.updateCardsOrder(list)
+                    }
+                }
+
                 LazyColumn(
+                    state = lazyListState,
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(
-                        items = filteredCards,
+                        items = list,
                         key = { it.id }
                     ) { card ->
-                        CardItemRow(
-                            card = card,
-                            onClick = { onCardClick(card.id) },
-                            onToggleFavorite = { viewModel.toggleFavorite(card) },
-                            onEdit = { onEditClick(card.id) },
-                            onDelete = { viewModel.deleteCard(card) }
-                        )
+                        ReorderableItem(reorderableState, key = card.id) {
+                            val interactionSource = remember { MutableInteractionSource() }
+                            
+                            Box(modifier = Modifier.longPressDraggableHandle(interactionSource = interactionSource)) {
+                                CardItemRow(
+                                    card = card,
+                                    onClick = { onCardClick(card.id) },
+                                    onToggleFavorite = { viewModel.toggleFavorite(card) },
+                                    onEdit = { onEditClick(card.id) },
+                                    onDelete = { viewModel.deleteCard(card) }
+                                )
+                            }
+                        }
                     }
                 }
             }
