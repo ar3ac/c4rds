@@ -26,8 +26,23 @@ object ShortcutHelper {
             
             val drawable = androidx.core.content.ContextCompat.getDrawable(context, brandInfo.iconResId!!)
             if (drawable != null) {
-                val padding = 32
-                drawable.setBounds(padding, padding, size - padding, size - padding)
+                val dWidth = drawable.intrinsicWidth.toFloat()
+                val dHeight = drawable.intrinsicHeight.toFloat()
+                val padding = 48f // Maggior padding per restare nella safe zone circolare
+                val availableSize = size - padding * 2
+                
+                val scale = if (dWidth > 0 && dHeight > 0) {
+                    kotlin.math.min(availableSize / dWidth, availableSize / dHeight)
+                } else {
+                    1f
+                }
+                
+                val sWidth = dWidth * scale
+                val sHeight = dHeight * scale
+                val left = (size - sWidth) / 2f
+                val top = (size - sHeight) / 2f
+                
+                drawable.setBounds(left.toInt(), top.toInt(), (left + sWidth).toInt(), (top + sHeight).toInt())
                 drawable.draw(canvas)
             }
         } else {
@@ -77,7 +92,7 @@ object ShortcutHelper {
         val shortcutLabel = if (card.owner.isNotBlank()) "${card.name} (${card.owner})" else card.name
 
         val shortcutInfo = ShortcutInfoCompat.Builder(context, "card_shortcut_${card.id}")
-            .setShortLabel(card.name)
+            .setShortLabel(shortcutLabel)
             .setLongLabel(shortcutLabel)
             .setIcon(icon)
             .setIntent(intent)
@@ -102,7 +117,7 @@ object ShortcutHelper {
             val shortcutLabel = if (card.owner.isNotBlank()) "${card.name} (${card.owner})" else card.name
 
             ShortcutInfoCompat.Builder(context, "dynamic_card_${card.id}")
-                .setShortLabel(card.name)
+                .setShortLabel(shortcutLabel)
                 .setLongLabel(shortcutLabel)
                 .setIcon(icon)
                 .setIntent(intent)
