@@ -55,6 +55,7 @@ fun HomeScreen(
 ) {
     val allCards by viewModel.cards.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val filteredCards = remember(allCards, viewModel.searchQuery) {
         val query = viewModel.searchQuery.trim().lowercase()

@@ -21,8 +21,8 @@ interface CardDao {
     @Query("SELECT * FROM cards WHERE favorite = 1 ORDER BY name ASC")
     fun getFavoriteCards(): Flow<List<CardEntity>>
 
-    @Query("SELECT COUNT(*) FROM cards WHERE favorite = 1")
-    suspend fun getFavoritesCount(): Int
+    @Query("SELECT COUNT(*) FROM cards WHERE favorite = :isFavorite")
+    suspend fun getFavoritesCount(isFavorite: Boolean = true): Int
 
     @Query("SELECT * FROM cards WHERE id = :id LIMIT 1")
     suspend fun getCardById(id: Long): CardEntity?

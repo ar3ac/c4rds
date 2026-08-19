@@ -29,7 +29,7 @@ class HomeViewModel(
     fun toggleFavorite(card: CardEntity, onLimitReached: () -> Unit) {
         viewModelScope.launch {
             if (!card.favorite) {
-                val currentFavorites = repository.getFavoritesCount()
+                val currentFavorites = cards.value.count { it.favorite }
                 if (currentFavorites >= 3) {
                     onLimitReached()
                     return@launch
