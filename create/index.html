@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>c4rds — Importa Tessera</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0A1628;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .card {
+            background: #132238;
+            border-radius: 20px;
+            padding: 40px 32px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .logo {
+            background: #0A3D6B;
+            color: white;
+            font-weight: 900;
+            font-size: 28px;
+            width: 80px;
+            height: 80px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            letter-spacing: -0.5px;
+        }
+        h1 { font-size: 24px; margin-bottom: 8px; }
+        .subtitle { color: #8899AA; font-size: 15px; margin-bottom: 28px; }
+        .info {
+            background: #0D1B2A;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        .info-row { display: flex; justify-content: space-between; padding: 6px 0; }
+        .info-label { color: #6688AA; font-size: 13px; }
+        .info-value { color: #fff; font-weight: 600; font-size: 14px; }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: #0A3D6B;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #0D4F8B; }
+        .fallback {
+            margin-top: 16px;
+            color: #5577AA;
+            font-size: 13px;
+        }
+        .fallback a { color: #6699CC; }
+        #status { color: #44AA66; font-size: 14px; margin-top: 12px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo">c4</div>
+        <h1>Importa Tessera</h1>
+        <p class="subtitle">Qualcuno ti ha condiviso una tessera fedeltà</p>
+        
+        <div class="info" id="card-info">
+            <div class="info-row">
+                <span class="info-label">Negozio</span>
+                <span class="info-value" id="card-name">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Codice</span>
+                <span class="info-value" id="card-barcode">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Formato</span>
+                <span class="info-value" id="card-format">—</span>
+            </div>
+        </div>
+
+        <a id="open-btn" class="btn" href="#">Apri nell'app c4rds</a>
+        <p id="status">✓ Redirect in corso...</p>
+        <p class="fallback">Non hai l'app? <a href="https://github.com/ar3ac/c4rds/releases">Scaricala qui</a></p>
+    </div>
+
+    <script>
+        // Parse URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get('name') || '';
+        const barcode = params.get('barcode') || '';
+        const format = params.get('format') || '';
+        const owner = params.get('owner') || '';
+
+        // Display card info
+        document.getElementById('card-name').textContent = name || '—';
+        document.getElementById('card-barcode').textContent = barcode || '—';
+        document.getElementById('card-format').textContent = format || '—';
+
+        // Build the intent:// URL (Android-native, works from any browser)
+        // This is the industry-standard way to open an app from a web page
+        const intentUrl = 'intent://create?' +
+            'name=' + encodeURIComponent(name) +
+            '&barcode=' + encodeURIComponent(barcode) +
+            '&format=' + encodeURIComponent(format) +
+            '&owner=' + encodeURIComponent(owner) +
+            '#Intent;scheme=c4rds;package=com.example.mycards;end';
+        
+        // Also build a direct c4rds:// fallback
+        const directUrl = 'c4rds://create?' +
+            'name=' + encodeURIComponent(name) +
+            '&barcode=' + encodeURIComponent(barcode) +
+            '&format=' + encodeURIComponent(format) +
+            '&owner=' + encodeURIComponent(owner);
+
+        // Set the button href
+        document.getElementById('open-btn').href = intentUrl;
+
+        // Auto-redirect: try intent:// first (works perfectly in Chrome on Android)
+        document.getElementById('open-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('status').style.display = 'block';
+            
+            // Try intent:// URL (Chrome Android standard)
+            window.location.href = intentUrl;
+            
+            // Fallback: try direct scheme after a short delay
+            setTimeout(function() {
+                window.location.href = directUrl;
+            }, 500);
+        });
+    </script>
+</body>
+</html>
