@@ -188,17 +188,29 @@ fun SettingsScreen(
                 }
             }
 
-            // Info Versione App
-            Box(
+            // Info Versione App e Crediti
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
-                contentAlignment = Alignment.Center
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = "c4rds v1.4.0 — Modello Locale Pure Native",
-                    style = MaterialTheme.typography.labelMedium,
+                    text = "c4rds v1.5.0",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Powered by Luca Marrazzo aka ar3ac",
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "luca.marrazzo@gmail.com",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
