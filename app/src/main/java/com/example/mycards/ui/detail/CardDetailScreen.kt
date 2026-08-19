@@ -84,7 +84,7 @@ fun CardDetailScreen(
                                 val safeBarcode = android.net.Uri.encode(currentCard.barcodeValue)
                                 val safeFormat = android.net.Uri.encode(currentCard.barcodeFormat)
                                 val safeOwner = android.net.Uri.encode(currentCard.owner)
-                                val shareLink = "https://ar3ac.github.io/c4rds/create/?name=$safeName&barcode=$safeBarcode&format=$safeFormat&owner=$safeOwner"
+                                val shareLink = "https://ar3ac.github.io/c4rds-share/create/?name=$safeName&barcode=$safeBarcode&format=$safeFormat&owner=$safeOwner"
                                 
                                 val text = "Ecco la mia tessera: *${currentCard.name}*\nCodice: ${currentCard.barcodeValue}\n\n$shareLink"
                                 putExtra(Intent.EXTRA_TEXT, text)

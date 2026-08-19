@@ -335,7 +335,7 @@ fun CardItemRow(
                             val safeBarcode = android.net.Uri.encode(card.barcodeValue)
                             val safeFormat = android.net.Uri.encode(card.barcodeFormat)
                             val safeOwner = android.net.Uri.encode(card.owner)
-                            val shareLink = "https://ar3ac.github.io/c4rds/create/?name=$safeName&barcode=$safeBarcode&format=$safeFormat&owner=$safeOwner"
+                            val shareLink = "https://ar3ac.github.io/c4rds-share/create/?name=$safeName&barcode=$safeBarcode&format=$safeFormat&owner=$safeOwner"
                             
                             val text = "Ecco la mia tessera: *${card.name}*\nCodice: ${card.barcodeValue}\n\n$shareLink"
                             val sendIntent = Intent().apply {
