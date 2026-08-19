@@ -220,8 +220,17 @@ fun CameraPreviewWithAnalyzer(
 
                 val barcodeScanner = BarcodeScanning.getClient(barcodeScannerOptions)
 
+                val resolutionSelector = androidx.camera.core.resolutionselector.ResolutionSelector.Builder()
+                    .setResolutionStrategy(
+                        androidx.camera.core.resolutionselector.ResolutionStrategy(
+                            android.util.Size(1280, 720),
+                            androidx.camera.core.resolutionselector.ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
+                        )
+                    ).build()
+
                 val imageAnalysis = ImageAnalysis.Builder()
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                    .setResolutionSelector(resolutionSelector)
                     .build()
 
                 imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
@@ -256,12 +265,24 @@ fun CameraPreviewWithAnalyzer(
 
                 try {
                     cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(
+                    val camera = cameraProvider.bindToLifecycle(
                         lifecycleOwner,
                         CameraSelector.DEFAULT_BACK_CAMERA,
                         preview,
                         imageAnalysis
                     )
+                    
+                    // Applica un leggero zoom per facilitare la scansione dei barcode 1D
+                    val zoomState = camera.cameraInfo.zoomState.value
+                    if (zoomState != null) {
+                        val maxZoom = zoomState.maxZoomRatio
+                        val targetZoom = 1.5f
+                        if (maxZoom >= targetZoom) {
+                            camera.cameraControl.setZoomRatio(targetZoom)
+                        } else if (maxZoom > 1f) {
+                            camera.cameraControl.setZoomRatio(maxZoom)
+                        }
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
