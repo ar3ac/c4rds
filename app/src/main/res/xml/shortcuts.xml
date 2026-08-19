@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="add_card"
+        android:enabled="true"
+        android:icon="@drawable/ic_add_shortcut"
+        android:shortcutShortLabel="@string/shortcut_add_card_short"
+        android:shortcutLongLabel="@string/shortcut_add_card_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.mycards"
+            android:targetClass="com.example.mycards.MainActivity"
+            android:data="mycards://add" />
+    </shortcut>
+</shortcuts>

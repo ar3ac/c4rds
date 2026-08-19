@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">c4rds</string>
+    <string name="shortcut_add_card_short">Aggiungi carta</string>
+    <string name="shortcut_add_card_long">Aggiungi nuova tessera fedeltà su c4rds</string>
+</resources>

@@ -1,0 +1,159 @@
+package com.example.mycards.ui.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import com.example.mycards.MyCardsApplication
+import com.example.mycards.ui.add.AddEditCardScreen
+import com.example.mycards.ui.add.AddEditViewModel
+import com.example.mycards.ui.add.AddEditViewModelFactory
+import com.example.mycards.ui.detail.CardDetailScreen
+import com.example.mycards.ui.detail.CardDetailViewModel
+import com.example.mycards.ui.detail.CardDetailViewModelFactory
+import com.example.mycards.ui.home.HomeScreen
+import com.example.mycards.ui.home.HomeViewModel
+import com.example.mycards.ui.home.HomeViewModelFactory
+import com.example.mycards.ui.scan.BarcodeScannerScreen
+import com.example.mycards.ui.settings.SettingsScreen
+import com.example.mycards.ui.settings.SettingsViewModel
+import com.example.mycards.ui.settings.SettingsViewModelFactory
+
+@Composable
+fun NavGraph(
+    navController: NavHostController,
+    application: MyCardsApplication,
+    startDestination: String = Screen.Home.route
+) {
+    val repository = application.repository
+
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
+    ) {
+        // Home Screen
+        composable(Screen.Home.route) {
+            val viewModel: HomeViewModel = viewModel(
+                factory = HomeViewModelFactory(repository)
+            )
+            HomeScreen(
+                viewModel = viewModel,
+                onCardClick = { cardId ->
+                    navController.navigate(Screen.Detail.createRoute(cardId))
+                },
+                onScanClick = {
+                    navController.navigate(Screen.Scan.route)
+                },
+                onAddManualClick = {
+                    navController.navigate(Screen.Add.createRoute())
+                },
+                onEditClick = { cardId ->
+                    navController.navigate(Screen.Add.createRoute(cardId = cardId))
+                },
+                onSettingsClick = {
+                    navController.navigate(Screen.Settings.route)
+                }
+            )
+        }
+
+        // Camera Scanner Screen
+        composable(Screen.Scan.route) {
+            BarcodeScannerScreen(
+                onBarcodeDetected = { value, format ->
+                    navController.navigate(Screen.Add.createRoute(initialValue = value, initialFormat = format)) {
+                        popUpTo(Screen.Scan.route) { inclusive = true }
+                    }
+                },
+                onManualInputClick = {
+                    navController.navigate(Screen.Add.createRoute()) {
+                        popUpTo(Screen.Scan.route) { inclusive = true }
+                    }
+                },
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        // Add / Edit Card Screen
+        composable(
+            route = Screen.Add.route,
+            arguments = listOf(
+                navArgument("cardId") { type = NavType.LongType; defaultValue = -1L },
+                navArgument("initialValue") { type = NavType.StringType; defaultValue = "" },
+                navArgument("initialFormat") { type = NavType.StringType; defaultValue = "" },
+                navArgument("initialName") { type = NavType.StringType; defaultValue = "" },
+                navArgument("initialOwner") { type = NavType.StringType; defaultValue = "" }
+            ),
+            deepLinks = listOf(
+                navDeepLink { uriPattern = "mycards://add" },
+                navDeepLink { uriPattern = "mycards://create?name={initialName}&barcode={initialValue}&format={initialFormat}&owner={initialOwner}" },
+                navDeepLink { uriPattern = "c4rds://create?name={initialName}&barcode={initialValue}&format={initialFormat}&owner={initialOwner}" },
+                navDeepLink { uriPattern = "https://c4rds.app/create?name={initialName}&barcode={initialValue}&format={initialFormat}&owner={initialOwner}" }
+            )
+        ) { backStackEntry ->
+            val cardId = backStackEntry.arguments?.getLong("cardId") ?: -1L
+            val rawValue = backStackEntry.arguments?.getString("initialValue") ?: ""
+            val rawFormat = backStackEntry.arguments?.getString("initialFormat") ?: ""
+            val rawName = backStackEntry.arguments?.getString("initialName") ?: ""
+            val rawOwner = backStackEntry.arguments?.getString("initialOwner") ?: ""
+
+            val initialValue = if (rawValue.isNotBlank()) UriUtil.decode(rawValue) else ""
+            val initialFormat = if (rawFormat.isNotBlank()) UriUtil.decode(rawFormat) else ""
+            val initialName = if (rawName.isNotBlank()) UriUtil.decode(rawName) else ""
+            val initialOwner = if (rawOwner.isNotBlank()) UriUtil.decode(rawOwner) else ""
+
+            val viewModel: AddEditViewModel = viewModel(
+                factory = AddEditViewModelFactory(repository, cardId, initialValue, initialFormat, initialName, initialOwner)
+            )
+
+            AddEditCardScreen(
+                viewModel = viewModel,
+                onSaveSuccess = { savedCardId ->
+                    navController.navigate(Screen.Detail.createRoute(savedCardId)) {
+                        popUpTo(Screen.Home.route)
+                    }
+                },
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        // Card Detail Screen (Supermarket Scanner View)
+        composable(
+            route = Screen.Detail.route,
+            arguments = listOf(
+                navArgument("cardId") { type = NavType.LongType }
+            ),
+            deepLinks = listOf(
+                navDeepLink { uriPattern = "mycards://card/{cardId}" }
+            )
+        ) { backStackEntry ->
+            val cardId = backStackEntry.arguments?.getLong("cardId") ?: -1L
+            val viewModel: CardDetailViewModel = viewModel(
+                factory = CardDetailViewModelFactory(repository, cardId)
+            )
+
+            CardDetailScreen(
+                viewModel = viewModel,
+                onEditClick = { id ->
+                    navController.navigate(Screen.Add.createRoute(cardId = id))
+                },
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        // Settings & Backup Screen
+        composable(Screen.Settings.route) {
+            val viewModel: SettingsViewModel = viewModel(
+                factory = SettingsViewModelFactory(repository)
+            )
+
+            SettingsScreen(
+                viewModel = viewModel,
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+    }
+}

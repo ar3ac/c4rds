@@ -1,0 +1,26 @@
+# Built APKs
+*.apk
+*.aab
+*.ap_
+
+# Build outputs
+/build/
+/app/build/
+/app/release/
+
+# Gradle files
+.gradle/
+gradle/wrapper/gradle-wrapper.jar
+
+# Local configuration
+local.properties
+*.log
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Keystore
+*.jks
+*.keystore
