@@ -13,6 +13,53 @@ import com.example.mycards.data.model.CardEntity
 
 object ShortcutHelper {
 
+    private fun createShortcutIcon(context: Context, cardName: String, brandInfo: BrandInfo): IconCompat {
+        val size = 192 // Dimensione standard per icone adattive
+        val bitmap = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(bitmap)
+        val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+
+        if (brandInfo.iconResId != null) {
+            // Sfondo bianco
+            paint.color = android.graphics.Color.WHITE
+            canvas.drawRect(0f, 0f, size.toFloat(), size.toFloat(), paint)
+            
+            val drawable = androidx.core.content.ContextCompat.getDrawable(context, brandInfo.iconResId!!)
+            if (drawable != null) {
+                val padding = 32
+                drawable.setBounds(padding, padding, size - padding, size - padding)
+                drawable.draw(canvas)
+            }
+        } else {
+            // Colori stile avatar
+            val colors = listOf(
+                android.graphics.Color.parseColor("#E53935"), // Red
+                android.graphics.Color.parseColor("#8E24AA"), // Purple
+                android.graphics.Color.parseColor("#3949AB"), // Indigo
+                android.graphics.Color.parseColor("#039BE5"), // Light Blue
+                android.graphics.Color.parseColor("#00897B"), // Teal
+                android.graphics.Color.parseColor("#43A047"), // Green
+                android.graphics.Color.parseColor("#F4511E")  // Deep Orange
+            )
+            val index = kotlin.math.abs(cardName.hashCode()) % colors.size
+            paint.color = colors[index]
+            canvas.drawRect(0f, 0f, size.toFloat(), size.toFloat(), paint)
+
+            val initial = if (cardName.isNotBlank()) cardName.trim().take(1).uppercase() else "?"
+            val textPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+                this.color = android.graphics.Color.WHITE
+                this.textSize = size * 0.5f
+                this.typeface = android.graphics.Typeface.DEFAULT_BOLD
+                this.textAlign = android.graphics.Paint.Align.CENTER
+            }
+            val xPos = (canvas.width / 2).toFloat()
+            val yPos = (canvas.height / 2 - (textPaint.descent() + textPaint.ascent()) / 2)
+            canvas.drawText(initial, xPos, yPos, textPaint)
+        }
+
+        return IconCompat.createWithAdaptiveBitmap(bitmap)
+    }
+
     fun createCardShortcut(context: Context, card: CardEntity) {
         if (!ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
             Toast.makeText(context, "Scorciatoie non supportate sul tuo launcher", Toast.LENGTH_SHORT).show()
@@ -20,7 +67,7 @@ object ShortcutHelper {
         }
 
         val brandInfo = BrandHelper.getBrandInfo(card.name)
-        val iconResId = brandInfo.iconResId ?: R.mipmap.ic_launcher
+        val icon = createShortcutIcon(context, card.name, brandInfo)
 
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("mycards://card/${card.id}"), context, MainActivity::class.java).apply {
             putExtra("cardId", card.id)
@@ -32,7 +79,7 @@ object ShortcutHelper {
         val shortcutInfo = ShortcutInfoCompat.Builder(context, "card_shortcut_${card.id}")
             .setShortLabel(card.name)
             .setLongLabel(shortcutLabel)
-            .setIcon(IconCompat.createWithResource(context, iconResId))
+            .setIcon(icon)
             .setIntent(intent)
             .build()
 
@@ -45,7 +92,7 @@ object ShortcutHelper {
     fun updateDynamicShortcuts(context: Context, cards: List<CardEntity>) {
         val shortcuts = cards.take(4).map { card ->
             val brandInfo = BrandHelper.getBrandInfo(card.name)
-            val iconResId = brandInfo.iconResId ?: R.mipmap.ic_launcher
+            val icon = createShortcutIcon(context, card.name, brandInfo)
 
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("mycards://card/${card.id}"), context, MainActivity::class.java).apply {
                 putExtra("cardId", card.id)
@@ -57,7 +104,7 @@ object ShortcutHelper {
             ShortcutInfoCompat.Builder(context, "dynamic_card_${card.id}")
                 .setShortLabel(card.name)
                 .setLongLabel(shortcutLabel)
-                .setIcon(IconCompat.createWithResource(context, iconResId))
+                .setIcon(icon)
                 .setIntent(intent)
                 .build()
         }
