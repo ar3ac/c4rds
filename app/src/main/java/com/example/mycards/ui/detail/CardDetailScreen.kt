@@ -84,10 +84,9 @@ fun CardDetailScreen(
                                 val safeBarcode = android.net.Uri.encode(currentCard.barcodeValue)
                                 val safeFormat = android.net.Uri.encode(currentCard.barcodeFormat)
                                 val safeOwner = android.net.Uri.encode(currentCard.owner)
-                                // Usiamo c4rds:// per garantire l'apertura diretta dell'app senza dover verificare il dominio web
-                                val deepLink = "c4rds://create?name=$safeName&barcode=$safeBarcode&format=$safeFormat&owner=$safeOwner"
+                                val shareLink = "https://ar3ac.github.io/c4rds/create/?name=$safeName&barcode=$safeBarcode&format=$safeFormat&owner=$safeOwner"
                                 
-                                val text = "Ecco la mia tessera: **${currentCard.name}**\nCodice: ${currentCard.barcodeValue}\n\nPer importarla automaticamente nell'app c4rds, copia questo link e incollalo nel browser del telefono:\n$deepLink"
+                                val text = "Ecco la mia tessera: *${currentCard.name}*\nCodice: ${currentCard.barcodeValue}\n\n$shareLink"
                                 putExtra(Intent.EXTRA_TEXT, text)
                                 type = "text/plain"
                             }

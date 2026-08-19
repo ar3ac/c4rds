@@ -335,9 +335,9 @@ fun CardItemRow(
                             val safeBarcode = android.net.Uri.encode(card.barcodeValue)
                             val safeFormat = android.net.Uri.encode(card.barcodeFormat)
                             val safeOwner = android.net.Uri.encode(card.owner)
-                            val deepLink = "c4rds://create?name=$safeName&barcode=$safeBarcode&format=$safeFormat&owner=$safeOwner"
+                            val shareLink = "https://ar3ac.github.io/c4rds/create/?name=$safeName&barcode=$safeBarcode&format=$safeFormat&owner=$safeOwner"
                             
-                            val text = "Ecco la mia tessera: *${card.name}*\nCodice: ${card.barcodeValue}\n\nPer importarla nell'app c4rds, copia questo link nel browser:\n$deepLink"
+                            val text = "Ecco la mia tessera: *${card.name}*\nCodice: ${card.barcodeValue}\n\n$shareLink"
                             val sendIntent = Intent().apply {
                                 action = Intent.ACTION_SEND
                                 putExtra(Intent.EXTRA_TEXT, text)
