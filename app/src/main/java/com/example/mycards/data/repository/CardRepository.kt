@@ -18,6 +18,10 @@ class CardRepository(
 
     val favoriteCards: Flow<List<CardEntity>> = cardDao.getFavoriteCards()
 
+    suspend fun getFavoritesCount(): Int {
+        return cardDao.getFavoritesCount()
+    }
+
     suspend fun getCardById(id: Long): CardEntity? {
         return cardDao.getCardById(id)
     }

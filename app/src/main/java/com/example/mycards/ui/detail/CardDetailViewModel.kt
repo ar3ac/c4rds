@@ -22,9 +22,16 @@ class CardDetailViewModel(
             initialValue = null
         )
 
-    fun toggleFavorite() {
+    fun toggleFavorite(onLimitReached: () -> Unit) {
         val currentCard = card.value ?: return
         viewModelScope.launch {
+            if (!currentCard.favorite) {
+                val currentFavorites = repository.getFavoritesCount()
+                if (currentFavorites >= 3) {
+                    onLimitReached()
+                    return@launch
+                }
+            }
             repository.updateCard(currentCard.copy(favorite = !currentCard.favorite))
         }
     }

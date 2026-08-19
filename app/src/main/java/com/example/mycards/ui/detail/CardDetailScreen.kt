@@ -98,7 +98,11 @@ fun CardDetailScreen(
                         IconButton(onClick = { copyToClipboard() }) {
                             Icon(Icons.Default.ContentCopy, contentDescription = "Copia Codice")
                         }
-                        IconButton(onClick = { viewModel.toggleFavorite() }) {
+                        IconButton(onClick = {
+                            viewModel.toggleFavorite {
+                                Toast.makeText(context, "Puoi avere al massimo 3 tessere preferite per i comandi rapidi.", Toast.LENGTH_SHORT).show()
+                            }
+                        }) {
                             Icon(
                                 imageVector = if (currentCard.favorite) Icons.Default.Star else Icons.Outlined.StarOutline,
                                 contentDescription = "Preferito",

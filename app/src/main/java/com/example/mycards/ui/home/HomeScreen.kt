@@ -180,7 +180,11 @@ fun HomeScreen(
                                 CardItemRow(
                                     card = card,
                                     onClick = { onCardClick(card.id) },
-                                    onToggleFavorite = { viewModel.toggleFavorite(card) },
+                                    onToggleFavorite = {
+                                        viewModel.toggleFavorite(card) {
+                                            Toast.makeText(context, "Puoi avere al massimo 3 tessere preferite per i comandi rapidi.", Toast.LENGTH_SHORT).show()
+                                        }
+                                    },
                                     onEdit = { onEditClick(card.id) },
                                     onDelete = { viewModel.deleteCard(card) }
                                 )
