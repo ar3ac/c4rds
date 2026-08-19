@@ -126,7 +126,7 @@ fun AddEditCardScreen(
                 value = viewModel.owner,
                 onValueChange = { viewModel.owner = it },
                 label = { Text("Nickname / Note") },
-                placeholder = { Text("es. Luca, Mamma, Personale") },
+                placeholder = { Text("es. Nome, Personale, Aziendale") },
                 leadingIcon = {
                     Icon(Icons.Default.EditNote, contentDescription = null)
                 },
