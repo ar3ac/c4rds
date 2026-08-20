@@ -15,14 +15,15 @@ import java.io.File
 fun BrandIcon(
     brand: BrandInfo,
     modifier: Modifier = Modifier,
-    contentDescription: String? = brand.brandName
+    contentDescription: String? = brand.brandName,
+    contentScale: ContentScale = ContentScale.Fit
 ) {
     if (brand.iconResId != null) {
         Image(
             painter = painterResource(id = brand.iconResId),
             contentDescription = contentDescription,
             modifier = modifier,
-            contentScale = ContentScale.Crop
+            contentScale = contentScale
         )
     } else if (brand.localFilePath != null) {
         val bitmap = remember(brand.localFilePath) {
@@ -37,7 +38,7 @@ fun BrandIcon(
                 bitmap = bitmap,
                 contentDescription = contentDescription,
                 modifier = modifier,
-                contentScale = ContentScale.Crop
+                contentScale = contentScale
             )
         }
     }
