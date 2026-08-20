@@ -197,101 +197,164 @@ fun CameraPreviewWithAnalyzer(
         }
     }
 
-    AndroidView(
-        factory = { ctx ->
-            val previewView = PreviewView(ctx).apply {
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-            }
-
-            val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
-            cameraProviderFuture.addListener({
-                val cameraProvider = cameraProviderFuture.get()
-
-                val preview = Preview.Builder().build().also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView(
+            factory = { ctx ->
+                val previewView = PreviewView(ctx).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
                 }
 
-                val barcodeScannerOptions = BarcodeScannerOptions.Builder()
-                    .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
-                    .build()
+                val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
+                cameraProviderFuture.addListener({
+                    val cameraProvider = cameraProviderFuture.get()
 
-                val barcodeScanner = BarcodeScanning.getClient(barcodeScannerOptions)
+                    val preview = Preview.Builder().build().also {
+                        it.setSurfaceProvider(previewView.surfaceProvider)
+                    }
 
-                val resolutionSelector = androidx.camera.core.resolutionselector.ResolutionSelector.Builder()
-                    .setResolutionStrategy(
-                        androidx.camera.core.resolutionselector.ResolutionStrategy(
-                            android.util.Size(1280, 720),
-                            androidx.camera.core.resolutionselector.ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
-                        )
-                    ).build()
+                    val barcodeScannerOptions = BarcodeScannerOptions.Builder()
+                        .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
+                        .build()
 
-                val imageAnalysis = ImageAnalysis.Builder()
-                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                    .setResolutionSelector(resolutionSelector)
-                    .build()
+                    val barcodeScanner = BarcodeScanning.getClient(barcodeScannerOptions)
 
-                imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
-                    @androidx.annotation.OptIn(androidx.camera.core.ExperimentalGetImage::class)
-                    val mediaImage = imageProxy.image
-                    if (mediaImage != null && !isDetected) {
-                        val image = InputImage.fromMediaImage(
-                            mediaImage,
-                            imageProxy.imageInfo.rotationDegrees
-                        )
+                    val resolutionSelector = androidx.camera.core.resolutionselector.ResolutionSelector.Builder()
+                        .setResolutionStrategy(
+                            androidx.camera.core.resolutionselector.ResolutionStrategy(
+                                android.util.Size(1280, 720),
+                                androidx.camera.core.resolutionselector.ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
+                            )
+                        ).build()
 
-                        barcodeScanner.process(image)
-                            .addOnSuccessListener { barcodes ->
-                                for (barcode in barcodes) {
-                                    val rawValue = barcode.rawValue
-                                    if (rawValue != null && rawValue.trim().isNotEmpty() && !isDetected) {
-                                        isDetected = true
-                                        val formatStr = mapMlKitFormatToString(barcode.format)
-                                        Log.d("BarcodeScanner", "Scanned: $rawValue ($formatStr)")
-                                        onBarcodeDetected(rawValue, formatStr)
-                                        break
+                    val imageAnalysis = ImageAnalysis.Builder()
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .setResolutionSelector(resolutionSelector)
+                        .build()
+
+                    imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
+                        @androidx.annotation.OptIn(androidx.camera.core.ExperimentalGetImage::class)
+                        val mediaImage = imageProxy.image
+                        if (mediaImage != null && !isDetected) {
+                            val image = InputImage.fromMediaImage(
+                                mediaImage,
+                                imageProxy.imageInfo.rotationDegrees
+                            )
+
+                            barcodeScanner.process(image)
+                                .addOnSuccessListener { barcodes ->
+                                    for (barcode in barcodes) {
+                                        val rawValue = barcode.rawValue
+                                        if (rawValue != null && rawValue.trim().isNotEmpty() && !isDetected) {
+                                            isDetected = true
+                                            val formatStr = mapMlKitFormatToString(barcode.format)
+                                            android.util.Log.d("BarcodeScanner", "Scanned: $rawValue ($formatStr)")
+                                            onBarcodeDetected(rawValue, formatStr)
+                                            break
+                                        }
                                     }
                                 }
-                            }
-                            .addOnCompleteListener {
-                                imageProxy.close()
-                            }
-                    } else {
-                        imageProxy.close()
-                    }
-                }
-
-                try {
-                    cameraProvider.unbindAll()
-                    val camera = cameraProvider.bindToLifecycle(
-                        lifecycleOwner,
-                        CameraSelector.DEFAULT_BACK_CAMERA,
-                        preview,
-                        imageAnalysis
-                    )
-                    
-                    // Applica un leggero zoom per facilitare la scansione dei barcode 1D
-                    val zoomState = camera.cameraInfo.zoomState.value
-                    if (zoomState != null) {
-                        val maxZoom = zoomState.maxZoomRatio
-                        val targetZoom = 1.5f
-                        if (maxZoom >= targetZoom) {
-                            camera.cameraControl.setZoomRatio(targetZoom)
-                        } else if (maxZoom > 1f) {
-                            camera.cameraControl.setZoomRatio(maxZoom)
+                                .addOnCompleteListener {
+                                    imageProxy.close()
+                                }
+                        } else {
+                            imageProxy.close()
                         }
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }, ContextCompat.getMainExecutor(ctx))
 
-            previewView
-        },
-        modifier = Modifier.fillMaxSize()
-    )
+                    try {
+                        cameraProvider.unbindAll()
+                        val camera = cameraProvider.bindToLifecycle(
+                            lifecycleOwner,
+                            CameraSelector.DEFAULT_BACK_CAMERA,
+                            preview,
+                            imageAnalysis
+                        )
+                        
+                        // Applica un leggero zoom per facilitare la scansione dei barcode 1D
+                        val zoomState = camera.cameraInfo.zoomState.value
+                        if (zoomState != null) {
+                            val maxZoom = zoomState.maxZoomRatio
+                            val targetZoom = 1.5f
+                            if (maxZoom >= targetZoom) {
+                                camera.cameraControl.setZoomRatio(targetZoom)
+                            } else if (maxZoom > 1f) {
+                                camera.cameraControl.setZoomRatio(maxZoom)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }, androidx.core.content.ContextCompat.getMainExecutor(ctx))
+
+                previewView
+            },
+            modifier = Modifier.fillMaxSize()
+        )
+
+        // Overlay per lo scanner
+        androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+            val canvasWidth = size.width
+            val canvasHeight = size.height
+
+            // Calcola il rettangolo target (proporzioni per barcode 1D)
+            val rectWidth = canvasWidth * 0.85f
+            val rectHeight = rectWidth * 0.4f
+            val rectLeft = (canvasWidth - rectWidth) / 2f
+            val rectTop = (canvasHeight - rectHeight) / 2f
+
+            val targetRect = androidx.compose.ui.geometry.Rect(
+                left = rectLeft,
+                top = rectTop,
+                right = rectLeft + rectWidth,
+                bottom = rectTop + rectHeight
+            )
+
+            // Sfondo oscurato attorno al rettangolo
+            val path = androidx.compose.ui.graphics.Path().apply {
+                addRect(androidx.compose.ui.geometry.Rect(0f, 0f, canvasWidth, canvasHeight))
+                addRoundRect(
+                    androidx.compose.ui.geometry.RoundRect(
+                        rect = targetRect,
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(16.dp.toPx(), 16.dp.toPx())
+                    )
+                )
+                fillType = androidx.compose.ui.graphics.PathFillType.EvenOdd
+            }
+            drawPath(
+                path = path,
+                color = Color.Black.copy(alpha = 0.5f)
+            )
+
+            // Linea rossa laser animata fissa al centro
+            drawLine(
+                color = Color.Red,
+                start = androidx.compose.ui.geometry.Offset(rectLeft + 16.dp.toPx(), canvasHeight / 2),
+                end = androidx.compose.ui.geometry.Offset(rectLeft + rectWidth - 16.dp.toPx(), canvasHeight / 2),
+                strokeWidth = 3.dp.toPx()
+            )
+            
+            // Cornici agli angoli
+            val cornerLength = 32.dp.toPx()
+            val strokeWidth = 4.dp.toPx()
+            val cornerColor = Color.White
+            
+            // Top-Left
+            drawLine(cornerColor, androidx.compose.ui.geometry.Offset(rectLeft, rectTop), androidx.compose.ui.geometry.Offset(rectLeft + cornerLength, rectTop), strokeWidth)
+            drawLine(cornerColor, androidx.compose.ui.geometry.Offset(rectLeft, rectTop), androidx.compose.ui.geometry.Offset(rectLeft, rectTop + cornerLength), strokeWidth)
+            // Top-Right
+            drawLine(cornerColor, androidx.compose.ui.geometry.Offset(rectLeft + rectWidth, rectTop), androidx.compose.ui.geometry.Offset(rectLeft + rectWidth - cornerLength, rectTop), strokeWidth)
+            drawLine(cornerColor, androidx.compose.ui.geometry.Offset(rectLeft + rectWidth, rectTop), androidx.compose.ui.geometry.Offset(rectLeft + rectWidth, rectTop + cornerLength), strokeWidth)
+            // Bottom-Left
+            drawLine(cornerColor, androidx.compose.ui.geometry.Offset(rectLeft, rectTop + rectHeight), androidx.compose.ui.geometry.Offset(rectLeft + cornerLength, rectTop + rectHeight), strokeWidth)
+            drawLine(cornerColor, androidx.compose.ui.geometry.Offset(rectLeft, rectTop + rectHeight), androidx.compose.ui.geometry.Offset(rectLeft, rectTop + rectHeight - cornerLength), strokeWidth)
+            // Bottom-Right
+            drawLine(cornerColor, androidx.compose.ui.geometry.Offset(rectLeft + rectWidth, rectTop + rectHeight), androidx.compose.ui.geometry.Offset(rectLeft + rectWidth - cornerLength, rectTop + rectHeight), strokeWidth)
+            drawLine(cornerColor, androidx.compose.ui.geometry.Offset(rectLeft + rectWidth, rectTop + rectHeight), androidx.compose.ui.geometry.Offset(rectLeft + rectWidth, rectTop + rectHeight - cornerLength), strokeWidth)
+        }
+    }
 }
 
 private fun mapMlKitFormatToString(format: Int): String {
