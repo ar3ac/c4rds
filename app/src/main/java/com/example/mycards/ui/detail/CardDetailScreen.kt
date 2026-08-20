@@ -155,60 +155,7 @@ fun CardDetailScreen(
             ) {
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Logo Brand Ufficiale prominente con card elevata
-                if (brandInfo.iconResId != null || brandInfo.localFilePath != null) {
-                    Surface(
-                        shape = RoundedCornerShape(24.dp),
-                        color = Color.White,
-                        tonalElevation = 4.dp,
-                        shadowElevation = 6.dp,
-                        modifier = Modifier
-                            .widthIn(min = 140.dp, max = 220.dp)
-                            .height(105.dp)
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
-                        ) {
-                            com.example.mycards.ui.components.BrandIcon(
-                                brand = brandInfo,
-                                contentDescription = currentCard.name,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                // Nome Tessera / Supermercato
-                Text(
-                    text = currentCard.name,
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-
-                // Nickname / Note (es. solo "Luca", senza prefissi fisso, in font ben visibile)
-                if (currentCard.owner.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Surface(
-                        shape = RoundedCornerShape(16.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    ) {
-                        Text(
-                            text = currentCard.owner,
-                            style = MaterialTheme.typography.titleMedium.copy(fontSize = 17.sp),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(28.dp))
-
-                // Card contenente il Codice a Barre gigante
+                // Card contenente il Codice a Barre gigante (Spostata in alto)
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White
@@ -281,13 +228,66 @@ fun CardDetailScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Formato del codice a barre posizionato SOTTO in piccolo
+                // Formato del codice a barre
                 Text(
                     text = "Formato: ${currentCard.barcodeFormat}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     textAlign = TextAlign.Center
                 )
+
+                Spacer(modifier = Modifier.height(36.dp))
+
+                // Logo Brand Ufficiale prominente
+                if (brandInfo.iconResId != null || brandInfo.localFilePath != null) {
+                    Surface(
+                        shape = RoundedCornerShape(24.dp),
+                        color = Color.White,
+                        tonalElevation = 4.dp,
+                        shadowElevation = 6.dp,
+                        modifier = Modifier
+                            .widthIn(min = 140.dp, max = 220.dp)
+                            .height(105.dp)
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
+                        ) {
+                            com.example.mycards.ui.components.BrandIcon(
+                                brand = brandInfo,
+                                contentDescription = currentCard.name,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                // Nome Tessera / Supermercato
+                Text(
+                    text = currentCard.name,
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+
+                // Nickname / Note
+                if (currentCard.owner.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    ) {
+                        Text(
+                            text = currentCard.owner,
+                            style = MaterialTheme.typography.titleMedium.copy(fontSize = 17.sp),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
             }
