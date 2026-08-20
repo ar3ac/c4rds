@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import com.example.mycards.R
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.DragHandle
@@ -72,36 +73,76 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 12.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
+                        Image(
+                            painter = painterResource(id = R.mipmap.ic_launcher_round),
+                            contentDescription = "c4rds Logo",
                             modifier = Modifier
-                                .size(36.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color(0xFF0A3D6B)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = com.example.mycards.R.drawable.ic_launcher_foreground),
-                                contentDescription = "c4rds Logo",
-                                modifier = Modifier.size(36.dp)
+                                .size(48.dp)
+                                .clip(CircleShape)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                "Le tue tessere",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                "c4rds Wallet",
+                                fontWeight = FontWeight.ExtraBold,
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text(
-                            "c4rds",
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.headlineMedium
-                        )
                     }
-                },
-                actions = {
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Default.Settings, contentDescription = "Impostazioni & Backup")
+                    IconButton(
+                        onClick = onSettingsClick,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), CircleShape)
+                    ) {
+                        Icon(Icons.Default.Settings, contentDescription = "Impostazioni", tint = MaterialTheme.colorScheme.onSurface)
                     }
                 }
-            )
+                
+                Spacer(modifier = Modifier.height(20.dp))
+                
+                // Barra di ricerca rapida
+                OutlinedTextField(
+                    value = viewModel.searchQuery,
+                    onValueChange = { viewModel.searchQuery = it },
+                    placeholder = { Text("Cerca tessera o nickname...") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                    trailingIcon = {
+                        if (viewModel.searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { viewModel.searchQuery = "" }) {
+                                Icon(Icons.Default.Clear, contentDescription = "Pulisci")
+                            }
+                        }
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(24.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                        focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                        unfocusedBorderColor = Color.Transparent
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
@@ -118,25 +159,6 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Barra di ricerca rapida
-            OutlinedTextField(
-                value = viewModel.searchQuery,
-                onValueChange = { viewModel.searchQuery = it },
-                placeholder = { Text("Cerca tessera o nickname...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                trailingIcon = {
-                    if (viewModel.searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { viewModel.searchQuery = "" }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Pulisci")
-                        }
-                    }
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(24.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            )
 
             if (filteredCards.isEmpty()) {
                 EmptyStateView(
