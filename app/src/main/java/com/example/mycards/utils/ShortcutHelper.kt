@@ -19,12 +19,20 @@ object ShortcutHelper {
         val canvas = android.graphics.Canvas(bitmap)
         val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
 
-        if (brandInfo.iconResId != null) {
+        if (brandInfo.iconResId != null || brandInfo.localFilePath != null) {
             // Sfondo bianco
             paint.color = android.graphics.Color.WHITE
             canvas.drawRect(0f, 0f, size.toFloat(), size.toFloat(), paint)
             
-            val drawable = androidx.core.content.ContextCompat.getDrawable(context, brandInfo.iconResId!!)
+            val drawable = if (brandInfo.iconResId != null) {
+                androidx.core.content.ContextCompat.getDrawable(context, brandInfo.iconResId!!)
+            } else if (brandInfo.localFilePath != null) {
+                val file = java.io.File(brandInfo.localFilePath)
+                if (file.exists()) {
+                    android.graphics.drawable.BitmapDrawable(context.resources, android.graphics.BitmapFactory.decodeFile(file.absolutePath))
+                } else null
+            } else null
+            
             if (drawable != null) {
                 val dWidth = drawable.intrinsicWidth.toFloat()
                 val dHeight = drawable.intrinsicHeight.toFloat()

@@ -145,10 +145,28 @@ fun NavGraph(
         }
 
         // Settings & Backup Screen
-        composable(Screen.Settings.route) {
+        composable(
+            route = Screen.Settings.route,
+            arguments = listOf(
+                navArgument("importUri") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
             val viewModel: SettingsViewModel = viewModel(
                 factory = SettingsViewModelFactory(repository)
             )
+
+            val importUriString = backStackEntry.arguments?.getString("importUri") ?: ""
+            if (importUriString.isNotBlank()) {
+                val decodedUri = UriUtil.decode(importUriString)
+                val uri = android.net.Uri.parse(decodedUri)
+                // Usiamo un flag o LaunchedEffect nel ViewModel/Screen, ma per semplicità passiamo l'URI al ViewModel se non è stato ancora processato
+                androidx.compose.runtime.LaunchedEffect(uri) {
+                    viewModel.prepareImport(navController.context, uri)
+                }
+            }
 
             SettingsScreen(
                 viewModel = viewModel,

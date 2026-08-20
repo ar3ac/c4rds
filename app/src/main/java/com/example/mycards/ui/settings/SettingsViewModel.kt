@@ -38,6 +38,13 @@ class SettingsViewModel(
         }
     }
 
+    fun shareDatabase(context: Context) {
+        viewModelScope.launch {
+            val allCards = repository.allCards.first()
+            BackupManager.shareDatabase(context, allCards)
+        }
+    }
+
     fun prepareImport(context: Context, uri: Uri) {
         viewModelScope.launch {
             val result = BackupManager.importFromJson(context, uri)

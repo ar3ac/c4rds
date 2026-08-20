@@ -244,7 +244,7 @@ fun CardItemRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Icona Logo Brand Ufficiale o Badge Iniziali (ora in Card rettangolare su sfondo bianco)
-            if (brandInfo.iconResId != null) {
+            if (brandInfo.iconResId != null || brandInfo.localFilePath != null) {
                 Surface(
                     shape = RoundedCornerShape(8.dp),
                     color = Color.White,
@@ -257,10 +257,9 @@ fun CardItemRow(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)
                     ) {
-                        Image(
-                            painter = painterResource(id = brandInfo.iconResId),
+                        com.example.mycards.ui.components.BrandIcon(
+                            brand = brandInfo,
                             contentDescription = card.name,
-                            contentScale = ContentScale.Fit,
                             modifier = Modifier.fillMaxSize()
                         )
                     }

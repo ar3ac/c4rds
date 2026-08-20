@@ -6,7 +6,8 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
-    <!-- Nessun permesso INTERNET: App 100% Offline & Privacy Friendly -->
+    <!-- Permesso INTERNET per scaricare i loghi vettoriali aggiornati in background -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".MyCardsApplication"
@@ -48,10 +49,30 @@
                 <data android:scheme="http" android:host="c4rds.app" />
             </intent-filter>
 
+            <!-- Deep link per aprire i file .c4rds condivisi -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.c4rds" />
+                <data android:host="*" />
+            </intent-filter>
+
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

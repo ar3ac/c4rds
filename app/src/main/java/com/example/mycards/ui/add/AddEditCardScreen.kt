@@ -94,10 +94,10 @@ fun AddEditCardScreen(
                 },
                 label = { Text("Nome Tessera / Supermercato") },
                 placeholder = { Text("es. Esselunga, Iperal, Conad...") },
-                leadingIcon = if (currentBrandInfo.iconResId != null) {
+                leadingIcon = if (currentBrandInfo.iconResId != null || currentBrandInfo.localFilePath != null) {
                     {
-                        Image(
-                            painter = painterResource(id = currentBrandInfo.iconResId),
+                        com.example.mycards.ui.components.BrandIcon(
+                            brand = currentBrandInfo,
                             contentDescription = null,
                             modifier = Modifier
                                 .size(28.dp)
@@ -273,10 +273,11 @@ fun BrandSelectorDialog(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     val filteredList = remember(searchQuery) {
+        val all = BrandHelper.getAllBrands()
         if (searchQuery.isBlank()) {
-            BrandHelper.knownBrands
+            all
         } else {
-            BrandHelper.knownBrands.filter {
+            all.filter {
                 it.brandName.lowercase().contains(searchQuery.trim().lowercase())
             }
         }
@@ -332,9 +333,9 @@ fun BrandSelectorDialog(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier.padding(8.dp)
                             ) {
-                                if (brand.iconResId != null) {
-                                    Image(
-                                        painter = painterResource(id = brand.iconResId),
+                                if (brand.iconResId != null || brand.localFilePath != null) {
+                                    com.example.mycards.ui.components.BrandIcon(
+                                        brand = brand,
                                         contentDescription = brand.brandName,
                                         modifier = Modifier
                                             .size(44.dp)

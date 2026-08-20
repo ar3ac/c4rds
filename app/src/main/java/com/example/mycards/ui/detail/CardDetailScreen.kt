@@ -156,7 +156,7 @@ fun CardDetailScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Logo Brand Ufficiale prominente con card elevata
-                if (brandInfo.iconResId != null) {
+                if (brandInfo.iconResId != null || brandInfo.localFilePath != null) {
                     Surface(
                         shape = RoundedCornerShape(24.dp),
                         color = Color.White,
@@ -170,10 +170,9 @@ fun CardDetailScreen(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
                         ) {
-                            Image(
-                                painter = painterResource(id = brandInfo.iconResId),
+                            com.example.mycards.ui.components.BrandIcon(
+                                brand = brandInfo,
                                 contentDescription = currentCard.name,
-                                contentScale = ContentScale.Fit,
                                 modifier = Modifier.fillMaxSize()
                             )
                         }

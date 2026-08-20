@@ -5,7 +5,8 @@ import com.example.mycards.R
 
 data class BrandInfo(
     val brandName: String,
-    @DrawableRes val iconResId: Int?
+    @DrawableRes val iconResId: Int? = null,
+    val localFilePath: String? = null
 )
 
 object BrandHelper {
@@ -32,30 +33,49 @@ object BrandHelper {
         BrandInfo("Leroy Merlin", R.drawable.ic_brand_leroymerlin)
     )
 
+    fun getAllBrands(): List<BrandInfo> {
+        val cloud = CloudBrandManager.cloudBrands.map {
+            BrandInfo(it.name, null, it.localFilePath)
+        }
+        return knownBrands + cloud
+    }
+
     fun getBrandInfo(cardName: String): BrandInfo {
         val nameLower = cardName.trim().lowercase()
 
-        return when {
-            nameLower.contains("esselunga") -> BrandInfo("Esselunga", R.drawable.ic_brand_esselunga)
-            nameLower.contains("conad") -> BrandInfo("Conad", R.drawable.ic_brand_conad)
-            nameLower.contains("coop") -> BrandInfo("Coop", R.drawable.ic_brand_coop)
-            nameLower.contains("lidl") -> BrandInfo("Lidl", R.drawable.ic_brand_lidl)
-            nameLower.contains("eurospin") -> BrandInfo("Eurospin", R.drawable.ic_brand_eurospin)
-            nameLower.contains("iperal") -> BrandInfo("Iperal", R.drawable.ic_brand_iperal)
-            nameLower.contains("carrefour") -> BrandInfo("Carrefour", R.drawable.ic_brand_carrefour)
-            nameLower.contains("decathlon") -> BrandInfo("Decathlon", R.drawable.ic_brand_decathlon)
-            nameLower.contains("ikea") -> BrandInfo("IKEA", R.drawable.ic_brand_ikea)
-            nameLower.contains("tigot") -> BrandInfo("Tigotà", R.drawable.ic_brand_tigota)
-            nameLower.contains("crai") -> BrandInfo("Crai", R.drawable.ic_brand_crai)
-            nameLower.contains("md") -> BrandInfo("MD", R.drawable.ic_brand_md)
-            nameLower.contains("pam") -> BrandInfo("Pam", R.drawable.ic_brand_pam)
-            nameLower.contains("bennet") -> BrandInfo("Bennet", R.drawable.ic_brand_bennet)
-            nameLower.contains("despar") || nameLower.contains("spar") -> BrandInfo("Despar", R.drawable.ic_brand_despar)
-            nameLower.contains("sephora") -> BrandInfo("Sephora", R.drawable.ic_brand_sephora)
-            nameLower.contains("unieuro") -> BrandInfo("Unieuro", R.drawable.ic_brand_unieuro)
-            nameLower.contains("mediaworld") -> BrandInfo("MediaWorld", R.drawable.ic_brand_mediaworld)
-            nameLower.contains("leroy") -> BrandInfo("Leroy Merlin", R.drawable.ic_brand_leroymerlin)
-            else -> BrandInfo(cardName, null)
+        // Prima controlliamo i brand hardcoded locali per massima priorità
+        when {
+            nameLower.contains("esselunga") -> return BrandInfo("Esselunga", R.drawable.ic_brand_esselunga)
+            nameLower.contains("conad") -> return BrandInfo("Conad", R.drawable.ic_brand_conad)
+            nameLower.contains("coop") -> return BrandInfo("Coop", R.drawable.ic_brand_coop)
+            nameLower.contains("lidl") -> return BrandInfo("Lidl", R.drawable.ic_brand_lidl)
+            nameLower.contains("eurospin") -> return BrandInfo("Eurospin", R.drawable.ic_brand_eurospin)
+            nameLower.contains("iperal") -> return BrandInfo("Iperal", R.drawable.ic_brand_iperal)
+            nameLower.contains("carrefour") -> return BrandInfo("Carrefour", R.drawable.ic_brand_carrefour)
+            nameLower.contains("decathlon") -> return BrandInfo("Decathlon", R.drawable.ic_brand_decathlon)
+            nameLower.contains("ikea") -> return BrandInfo("IKEA", R.drawable.ic_brand_ikea)
+            nameLower.contains("tigot") -> return BrandInfo("Tigotà", R.drawable.ic_brand_tigota)
+            nameLower.contains("crai") -> return BrandInfo("Crai", R.drawable.ic_brand_crai)
+            nameLower.contains("md") -> return BrandInfo("MD", R.drawable.ic_brand_md)
+            nameLower.contains("pam") -> return BrandInfo("Pam", R.drawable.ic_brand_pam)
+            nameLower.contains("bennet") -> return BrandInfo("Bennet", R.drawable.ic_brand_bennet)
+            nameLower.contains("despar") || nameLower.contains("spar") -> return BrandInfo("Despar", R.drawable.ic_brand_despar)
+            nameLower.contains("sephora") -> return BrandInfo("Sephora", R.drawable.ic_brand_sephora)
+            nameLower.contains("unieuro") -> return BrandInfo("Unieuro", R.drawable.ic_brand_unieuro)
+            nameLower.contains("mediaworld") -> return BrandInfo("MediaWorld", R.drawable.ic_brand_mediaworld)
+            nameLower.contains("leroy") -> return BrandInfo("Leroy Merlin", R.drawable.ic_brand_leroymerlin)
         }
+
+        // Se non trovato, cerchiamo nei cloud brands
+        val cloudBrand = CloudBrandManager.cloudBrands.find { cloud ->
+            cloud.keywords.any { keyword -> nameLower.contains(keyword) }
+        }
+
+        if (cloudBrand != null) {
+            return BrandInfo(cloudBrand.name, null, cloudBrand.localFilePath)
+        }
+
+        // Nessun match
+        return BrandInfo(cardName, null, null)
     }
 }

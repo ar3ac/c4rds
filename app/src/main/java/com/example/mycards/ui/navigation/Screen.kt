@@ -21,7 +21,12 @@ sealed class Screen(val route: String) {
     object Detail : Screen("detail/{cardId}") {
         fun createRoute(cardId: Long) = "detail/$cardId"
     }
-    object Settings : Screen("settings")
+    object Settings : Screen("settings?importUri={importUri}") {
+        fun createRoute(importUri: String = ""): String {
+            val encodedUri = UriUtil.encode(importUri)
+            return "settings?importUri=$encodedUri"
+        }
+    }
 }
 
 object UriUtil {

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -140,7 +141,7 @@ fun SettingsScreen(
 
                         Button(
                             onClick = {
-                                importLauncher.launch("application/json")
+                                importLauncher.launch("*/*")
                             },
                             modifier = Modifier.weight(1f)
                         ) {
@@ -148,6 +149,15 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(6.dp))
                             Text("Importa")
                         }
+                    }
+
+                    OutlinedButton(
+                        onClick = { viewModel.shareDatabase(context) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Condividi intero Portafoglio Famiglia (.c4rds)")
                     }
                 }
             }

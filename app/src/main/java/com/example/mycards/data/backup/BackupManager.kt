@@ -75,4 +75,47 @@ object BackupManager {
             }
         }
     }
+
+    fun shareDatabase(context: Context, cards: List<CardEntity>) {
+        try {
+            val dtos = cards.map { card ->
+                BackupCardDto(
+                    name = card.name,
+                    barcodeValue = card.barcodeValue,
+                    barcodeFormat = card.barcodeFormat,
+                    favorite = card.favorite,
+                    owner = card.owner
+                )
+            }
+            val backupData = BackupDataDto(version = 1, cards = dtos)
+            val jsonString = gson.toJson(backupData)
+
+            val exportDir = java.io.File(context.cacheDir, "exports")
+            if (!exportDir.exists()) {
+                exportDir.mkdirs()
+            }
+
+            val exportFile = java.io.File(exportDir, "portafoglio_famiglia.c4rds")
+            exportFile.writeText(jsonString, Charsets.UTF_8)
+
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                exportFile
+            )
+
+            val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                type = "*/*"
+                putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                putExtra(android.content.Intent.EXTRA_SUBJECT, "Tessere c4rds")
+                putExtra(android.content.Intent.EXTRA_TEXT, "Ecco tutte le mie tessere! Apri questo file con l'app c4rds per importarle.")
+                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            context.startActivity(android.content.Intent.createChooser(shareIntent, "Condividi Portafoglio"))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            android.widget.Toast.makeText(context, "Errore durante la condivisione", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
 }
