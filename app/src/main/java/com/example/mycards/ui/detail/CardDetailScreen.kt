@@ -151,9 +151,9 @@ fun CardDetailScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Top
             ) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // Card contenente il Codice a Barre gigante (Spostata in alto)
                 Card(
@@ -167,7 +167,7 @@ fun CardDetailScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(24.dp),
+                            .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         if (barcodeBitmap != null) {
@@ -176,8 +176,8 @@ fun CardDetailScreen(
                                 contentDescription = "Codice a barre ${currentCard.name}",
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .heightIn(min = 180.dp, max = 320.dp)
-                                    .padding(vertical = 12.dp)
+                                    .heightIn(min = 100.dp, max = 160.dp)
+                                    .padding(vertical = 8.dp)
                             )
                         } else {
                             Text(
