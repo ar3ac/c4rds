@@ -236,7 +236,7 @@ fun SettingsScreen(
                 },
                 confirmButton = {
                     TextButton(onClick = { viewModel.confirmImportMerge() }) {
-                        Text("Unisci a esistenti")
+                        Text("Aggiungi a esistenti")
                     }
                 },
                 dismissButton = {
