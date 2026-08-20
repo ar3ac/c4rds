@@ -61,7 +61,7 @@ object BackupManager {
                 ?: throw IllegalArgumentException("File JSON non valido o vuoto.")
 
             if (backupData.version > 1) {
-                throw IllegalArgumentException("Versione backup (${backupData.version}) non supportata. Aggiorna l'app c4rds.")
+                throw IllegalArgumentException("Versione backup (${backupData.version}) non supportata. Aggiorna l'app C4rds.")
             }
 
             backupData.cards.map { dto ->
@@ -107,8 +107,8 @@ object BackupManager {
             val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                 type = "*/*"
                 putExtra(android.content.Intent.EXTRA_STREAM, uri)
-                putExtra(android.content.Intent.EXTRA_SUBJECT, "Tessere c4rds")
-                putExtra(android.content.Intent.EXTRA_TEXT, "Ecco tutte le mie tessere! Apri questo file con l'app c4rds per importarle.")
+                putExtra(android.content.Intent.EXTRA_SUBJECT, "Tessere C4rds")
+                putExtra(android.content.Intent.EXTRA_TEXT, "Ecco tutte le mie tessere! Apri questo file con l'app C4rds per importarle.")
                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 

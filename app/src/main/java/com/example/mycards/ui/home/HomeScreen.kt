@@ -87,25 +87,18 @@ fun HomeScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Image(
                             painter = painterResource(id = R.mipmap.ic_launcher_round),
-                            contentDescription = "c4rds Logo",
+                            contentDescription = "C4rds Logo",
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
-                        Column {
-                            Text(
-                                "Le tue tessere",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                "c4rds Wallet",
-                                fontWeight = FontWeight.ExtraBold,
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
+                        Text(
+                            "C4rds Wallet",
+                            fontWeight = FontWeight.ExtraBold,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                     IconButton(
                         onClick = onSettingsClick,

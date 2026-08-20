@@ -207,7 +207,7 @@ fun SettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = "c4rds v1.5.0",
+                    text = "C4rds v1.5.0",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
