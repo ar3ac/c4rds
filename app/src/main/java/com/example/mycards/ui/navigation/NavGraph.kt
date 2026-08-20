@@ -64,14 +64,10 @@ fun NavGraph(
         composable(Screen.Scan.route) {
             BarcodeScannerScreen(
                 onBarcodeDetected = { value, format ->
-                    navController.navigate(Screen.Add.createRoute(initialValue = value, initialFormat = format)) {
-                        popUpTo(Screen.Scan.route) { inclusive = true }
-                    }
+                    navController.navigate(Screen.Add.createRoute(initialValue = value, initialFormat = format))
                 },
                 onManualInputClick = {
-                    navController.navigate(Screen.Add.createRoute()) {
-                        popUpTo(Screen.Scan.route) { inclusive = true }
-                    }
+                    navController.navigate(Screen.Add.createRoute())
                 },
                 onBackClick = { navController.popBackStack() }
             )

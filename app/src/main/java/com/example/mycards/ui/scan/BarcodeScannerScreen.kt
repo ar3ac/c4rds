@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -62,6 +63,36 @@ fun BarcodeScannerScreen(
         hasCameraPermission = isGranted
     }
 
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            try {
+                val inputImage = InputImage.fromFilePath(context, uri)
+                val barcodeScannerOptions = BarcodeScannerOptions.Builder()
+                    .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
+                    .build()
+                val barcodeScanner = BarcodeScanning.getClient(barcodeScannerOptions)
+                barcodeScanner.process(inputImage)
+                    .addOnSuccessListener { barcodes ->
+                        if (barcodes.isNotEmpty()) {
+                            val barcode = barcodes.first()
+                            val rawValue = barcode.rawValue ?: ""
+                            val formatStr = mapMlKitFormatToString(barcode.format)
+                            onBarcodeDetected(rawValue, formatStr)
+                        } else {
+                            android.widget.Toast.makeText(context, "Nessun barcode rilevato nell'immagine", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .addOnFailureListener {
+                        android.widget.Toast.makeText(context, "Errore durante l'analisi dell'immagine", android.widget.Toast.LENGTH_SHORT).show()
+                    }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
         if (!hasCameraPermission) {
             permissionLauncher.launch(Manifest.permission.CAMERA)
@@ -78,6 +109,9 @@ fun BarcodeScannerScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { galleryLauncher.launch("image/*") }) {
+                        Icon(Icons.Default.PhotoLibrary, contentDescription = "Scegli da Galleria")
+                    }
                     TextButton(onClick = onManualInputClick) {
                         Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
@@ -97,36 +131,7 @@ fun BarcodeScannerScreen(
                     onBarcodeDetected = onBarcodeDetected
                 )
 
-                // Overlay mirino per scansione
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    val boxWidth = size.width * 0.8f
-                    val boxHeight = size.height * 0.35f
-                    val left = (size.width - boxWidth) / 2
-                    val top = (size.height - boxHeight) / 2
-
-                    // Sfondo semitrasparente
-                    drawRect(
-                        color = Color.Black.copy(alpha = 0.5f)
-                    )
-
-                    // Finestra trasparente al centro
-                    drawRoundRect(
-                        color = Color.Transparent,
-                        topLeft = Offset(left, top),
-                        size = Size(boxWidth, boxHeight),
-                        cornerRadius = CornerRadius(16.dp.toPx()),
-                        blendMode = BlendMode.Clear
-                    )
-
-                    // Bordo mirino verde/azzurro
-                    drawRoundRect(
-                        color = Color(0xFF00E676),
-                        topLeft = Offset(left, top),
-                        size = Size(boxWidth, boxHeight),
-                        cornerRadius = CornerRadius(16.dp.toPx()),
-                        style = Stroke(width = 3.dp.toPx())
-                    )
-                }
+                // Overlay rimosso (già gestito da CameraPreviewWithAnalyzer)
 
                 Text(
                     text = "Inquadra il codice a barre o QR",
