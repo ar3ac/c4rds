@@ -252,7 +252,22 @@ fun CameraPreviewWithAnalyzer(
                                 .addOnSuccessListener { barcodes ->
                                     for (barcode in barcodes) {
                                         val rawValue = barcode.rawValue
-                                        if (rawValue != null && rawValue.trim().isNotEmpty() && !isDetected) {
+                                        
+                                        // Verifica che il barcode sia nel rettangolo centrale
+                                        var isInsideTarget = true
+                                        val boundingBox = barcode.boundingBox
+                                        if (boundingBox != null) {
+                                            val imageWidth = image.width
+                                            val imageHeight = image.height
+                                            val centerX = boundingBox.centerX()
+                                            val centerY = boundingBox.centerY()
+                                            
+                                            // Rettangolo centrale tollerante (circa 60% di larghezza e 40% di altezza al centro)
+                                            isInsideTarget = (centerX > imageWidth * 0.2f && centerX < imageWidth * 0.8f) &&
+                                                             (centerY > imageHeight * 0.3f && centerY < imageHeight * 0.7f)
+                                        }
+
+                                        if (rawValue != null && rawValue.trim().isNotEmpty() && !isDetected && isInsideTarget) {
                                             isDetected = true
                                             val formatStr = mapMlKitFormatToString(barcode.format)
                                             android.util.Log.d("BarcodeScanner", "Scanned: $rawValue ($formatStr)")
