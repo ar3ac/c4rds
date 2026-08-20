@@ -25,3 +25,4 @@ local.properties
 *.jks
 *.keystore
 c4rds-share/
+build_and_deploy.sh
