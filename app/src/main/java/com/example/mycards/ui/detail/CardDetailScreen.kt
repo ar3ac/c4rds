@@ -171,9 +171,11 @@ fun CardDetailScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         if (barcodeBitmap != null) {
+                            val is2D = currentCard.barcodeFormat.contains("QR") || currentCard.barcodeFormat.contains("MATRIX")
                             Image(
                                 bitmap = barcodeBitmap.asImageBitmap(),
                                 contentDescription = "Codice a barre ${currentCard.name}",
+                                contentScale = if (is2D) ContentScale.Fit else ContentScale.FillBounds,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .heightIn(min = 100.dp, max = 160.dp)
