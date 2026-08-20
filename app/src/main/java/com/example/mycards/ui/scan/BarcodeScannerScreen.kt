@@ -257,14 +257,17 @@ fun CameraPreviewWithAnalyzer(
                                         var isInsideTarget = true
                                         val boundingBox = barcode.boundingBox
                                         if (boundingBox != null) {
-                                            val imageWidth = image.width
-                                            val imageHeight = image.height
+                                            val rotation = imageProxy.imageInfo.rotationDegrees
+                                            val isPortrait = rotation == 90 || rotation == 270
+                                            val actualWidth = if (isPortrait) image.height else image.width
+                                            val actualHeight = if (isPortrait) image.width else image.height
+                                            
                                             val centerX = boundingBox.centerX()
                                             val centerY = boundingBox.centerY()
                                             
-                                            // Rettangolo centrale tollerante (circa 60% di larghezza e 40% di altezza al centro)
-                                            isInsideTarget = (centerX > imageWidth * 0.2f && centerX < imageWidth * 0.8f) &&
-                                                             (centerY > imageHeight * 0.3f && centerY < imageHeight * 0.7f)
+                                            // Area centrale molto più stringente (circa il 40% del mirino)
+                                            isInsideTarget = (centerX > actualWidth * 0.3f && centerX < actualWidth * 0.7f) &&
+                                                             (centerY > actualHeight * 0.35f && centerY < actualHeight * 0.65f)
                                         }
 
                                         if (rawValue != null && rawValue.trim().isNotEmpty() && !isDetected && isInsideTarget) {
