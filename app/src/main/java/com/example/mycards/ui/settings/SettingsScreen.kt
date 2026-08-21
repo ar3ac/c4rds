@@ -240,7 +240,7 @@ fun SettingsScreen(
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { viewModel.confirmImportReplace() }) {
+                    TextButton(onClick = { viewModel.confirmImportReplace(context) }) {
                         Text("Sostituisci tutto", color = MaterialTheme.colorScheme.error)
                     }
                 }

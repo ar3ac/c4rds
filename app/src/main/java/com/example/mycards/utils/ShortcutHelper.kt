@@ -138,4 +138,19 @@ object ShortcutHelper {
             e.printStackTrace()
         }
     }
+
+    fun clearAllShortcuts(context: Context) {
+        try {
+            ShortcutManagerCompat.removeAllDynamicShortcuts(context)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1) {
+                val shortcutManager = context.getSystemService(android.content.pm.ShortcutManager::class.java)
+                val pinnedShortcuts = shortcutManager?.pinnedShortcuts?.map { it.id } ?: emptyList()
+                if (pinnedShortcuts.isNotEmpty()) {
+                    shortcutManager?.disableShortcuts(pinnedShortcuts, "Tessera non più presente nel portafoglio")
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }

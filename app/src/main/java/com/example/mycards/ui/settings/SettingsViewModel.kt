@@ -63,9 +63,10 @@ class SettingsViewModel(
         }
     }
 
-    fun confirmImportReplace() {
+    fun confirmImportReplace(context: Context) {
         val cards = pendingImportCards ?: return
         viewModelScope.launch {
+            com.example.mycards.utils.ShortcutHelper.clearAllShortcuts(context)
             repository.deleteAllCards()
             repository.insertAll(cards)
             statusMessage = "Ripristinate ${cards.size} tessere (database sostituito)."
