@@ -91,18 +91,41 @@ class AddEditViewModel(
         if (query.isBlank()) return
         isSearchingLogo = true
         viewModelScope.launch(Dispatchers.IO) {
+            val results = mutableListOf<LogoSearchResult>()
             try {
-                val url = "https://autocomplete.clearbit.com/v1/companies/suggest?query=${query.trim().replace(" ", "")}"
-                val jsonString = URL(url).readText()
-                val jsonArray = JSONArray(jsonString)
-                val results = mutableListOf<LogoSearchResult>()
-                
-                for (i in 0 until jsonArray.length()) {
-                    val obj = jsonArray.getJSONObject(i)
-                    val domain = obj.getString("domain")
-                    val nameStr = obj.getString("name")
-                    val logoUrl = "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://$domain&size=128"
-                    results.add(LogoSearchResult(nameStr, domain, logoUrl))
+                // 1. Seeklogo Search (High Quality)
+                try {
+                    val seeklogoUrl = "https://seeklogo.com/search?q=${java.net.URLEncoder.encode(query.trim(), "UTF-8")}"
+                    val html = URL(seeklogoUrl).readText()
+                    val regex = """src="(https://images\.seeklogo\.com/[^"]+)"[^>]*alt="([^"]+)"""".toRegex(RegexOption.IGNORE_CASE)
+                    val matches = regex.findAll(html)
+                    matches.take(8).forEach { match ->
+                        val logoUrl = match.groupValues[1]
+                        val nameStr = match.groupValues[2].replace(" Logo PNG Vector", "").replace(" Logo PNG", "")
+                        // Avoid duplicates if any
+                        if (results.none { it.logoUrl == logoUrl }) {
+                            results.add(LogoSearchResult(nameStr, "Seeklogo", logoUrl))
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("AddEditViewModel", "Error fetching from seeklogo", e)
+                }
+
+                // 2. Clearbit Autocomplete -> Google Favicon (Fallback)
+                try {
+                    val url = "https://autocomplete.clearbit.com/v1/companies/suggest?query=${query.trim().replace(" ", "")}"
+                    val jsonString = URL(url).readText()
+                    val jsonArray = JSONArray(jsonString)
+                    
+                    for (i in 0 until jsonArray.length()) {
+                        val obj = jsonArray.getJSONObject(i)
+                        val domain = obj.getString("domain")
+                        val nameStr = obj.getString("name")
+                        val logoUrl = "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://$domain&size=128"
+                        results.add(LogoSearchResult(nameStr, domain, logoUrl))
+                    }
+                } catch (e: Exception) {
+                    Log.e("AddEditViewModel", "Error fetching from clearbit", e)
                 }
                 
                 withContext(Dispatchers.Main) {
