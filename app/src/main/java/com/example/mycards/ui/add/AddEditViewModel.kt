@@ -96,8 +96,13 @@ class AddEditViewModel(
                 // 1. Seeklogo Search (High Quality)
                 try {
                     val seeklogoUrl = "https://seeklogo.com/search?q=${java.net.URLEncoder.encode(query.trim(), "UTF-8")}"
-                    val html = URL(seeklogoUrl).readText()
-                    val regex = """src="(https://images\.seeklogo\.com/[^"]+)"[^>]*alt="([^"]+)"""".toRegex(RegexOption.IGNORE_CASE)
+                    val connection = URL(seeklogoUrl).openConnection() as java.net.HttpURLConnection
+                    connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                    connection.connectTimeout = 5000
+                    connection.readTimeout = 5000
+                    val html = connection.inputStream.bufferedReader().use { it.readText() }
+                    
+                    val regex = "src=\"(https://images\\.seeklogo\\.com/[^\"]+)\"[^>]*alt=\"([^\"]+)\"".toRegex(RegexOption.IGNORE_CASE)
                     val matches = regex.findAll(html)
                     matches.take(8).forEach { match ->
                         val logoUrl = match.groupValues[1]
