@@ -236,7 +236,7 @@ fun CardItemRow(
     onDelete: () -> Unit
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
-    val brandInfo = remember(card.name) { BrandHelper.getBrandInfo(card.name) }
+    val brandInfo = remember(card.name, card.customLogoPath) { BrandHelper.getBrandInfo(card.name, card.customLogoPath) }
     val avatarColor = remember(card.name) { getBadgeColor(card.name) }
     val initial = remember(card.name) {
         if (card.name.isNotBlank()) card.name.trim().take(1).uppercase() else "?"

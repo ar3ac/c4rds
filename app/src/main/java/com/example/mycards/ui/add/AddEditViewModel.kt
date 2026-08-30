@@ -1,5 +1,7 @@
 package com.example.mycards.ui.add
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,7 +10,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.mycards.data.model.CardEntity
 import com.example.mycards.data.repository.CardRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import java.io.File
+import java.net.URL
+
+data class LogoSearchResult(val name: String, val domain: String, val logoUrl: String)
 
 class AddEditViewModel(
     private val repository: CardRepository,
@@ -26,10 +35,15 @@ class AddEditViewModel(
         if (initialFormat.isNotBlank()) initialFormat else "CODE_128"
     )
     var favorite by mutableStateOf(false)
+    var customLogoPath by mutableStateOf<String?>(null)
 
     var isEditMode by mutableStateOf(false)
     var isSaved by mutableStateOf(false)
     var errorMessage by mutableStateOf<String?>(null)
+
+    // Per la ricerca web del logo
+    var isSearchingLogo by mutableStateOf(false)
+    var logoSearchResults by mutableStateOf<List<LogoSearchResult>>(emptyList())
 
     // Flag per tracciare se l'utente ha modificato manualmente il formato via menu a tendina
     private var isUserCustomFormat = initialFormat.isNotBlank()
@@ -45,6 +59,7 @@ class AddEditViewModel(
                     barcodeValue = existing.barcodeValue
                     barcodeFormat = existing.barcodeFormat
                     favorite = existing.favorite
+                    customLogoPath = existing.customLogoPath
                     isUserCustomFormat = true
                 }
             }
@@ -70,6 +85,57 @@ class AddEditViewModel(
     fun onFormatSelected(format: String) {
         barcodeFormat = format
         isUserCustomFormat = true
+    }
+    
+    fun searchWebLogos(query: String) {
+        if (query.isBlank()) return
+        isSearchingLogo = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val url = "https://autocomplete.clearbit.com/v1/companies/suggest?query=${query.trim().replace(" ", "")}"
+                val jsonString = URL(url).readText()
+                val jsonArray = JSONArray(jsonString)
+                val results = mutableListOf<LogoSearchResult>()
+                
+                for (i in 0 until jsonArray.length()) {
+                    val obj = jsonArray.getJSONObject(i)
+                    val domain = obj.getString("domain")
+                    val nameStr = obj.getString("name")
+                    val logoUrl = "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://$domain&size=128"
+                    results.add(LogoSearchResult(nameStr, domain, logoUrl))
+                }
+                
+                withContext(Dispatchers.Main) {
+                    logoSearchResults = results
+                    isSearchingLogo = false
+                }
+            } catch (e: Exception) {
+                Log.e("AddEditViewModel", "Error searching logos", e)
+                withContext(Dispatchers.Main) {
+                    isSearchingLogo = false
+                }
+            }
+        }
+    }
+
+    fun downloadAndSetCustomLogo(context: Context, logoUrl: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val bytes = URL(logoUrl).readBytes()
+                val filename = "custom_logo_${System.currentTimeMillis()}.png"
+                val logosDir = File(context.filesDir, "custom_logos")
+                if (!logosDir.exists()) logosDir.mkdirs()
+                
+                val file = File(logosDir, filename)
+                file.writeBytes(bytes)
+                
+                withContext(Dispatchers.Main) {
+                    customLogoPath = file.absolutePath
+                }
+            } catch (e: Exception) {
+                Log.e("AddEditViewModel", "Error downloading custom logo", e)
+            }
+        }
     }
 
     fun saveCard(onSuccess: (Long) -> Unit) {
@@ -99,7 +165,8 @@ class AddEditViewModel(
                     owner = owner.trim(),
                     barcodeValue = cleanedBarcodeValue,
                     barcodeFormat = barcodeFormat,
-                    favorite = favorite
+                    favorite = favorite,
+                    customLogoPath = customLogoPath
                 )
                 repository.updateCard(cardToUpdate)
                 isSaved = true
@@ -110,7 +177,8 @@ class AddEditViewModel(
                     owner = owner.trim(),
                     barcodeValue = cleanedBarcodeValue,
                     barcodeFormat = barcodeFormat,
-                    favorite = favorite
+                    favorite = favorite,
+                    customLogoPath = customLogoPath
                 )
                 val newId = repository.insertCard(newCard)
                 isSaved = true

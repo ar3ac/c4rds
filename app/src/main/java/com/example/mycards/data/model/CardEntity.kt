@@ -15,5 +15,7 @@ data class CardEntity(
     @ColumnInfo(defaultValue = "0")
     val displayOrder: Int = 0,
     @ColumnInfo(defaultValue = "")
-    val owner: String = ""
+    val owner: String = "",
+    @ColumnInfo(defaultValue = "NULL")
+    val customLogoPath: String? = null
 )

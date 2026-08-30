@@ -89,7 +89,7 @@ object ShortcutHelper {
             return
         }
 
-        val brandInfo = BrandHelper.getBrandInfo(card.name)
+        val brandInfo = BrandHelper.getBrandInfo(card.name, card.customLogoPath)
         val icon = createShortcutIcon(context, card.name, brandInfo)
 
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("mycards://card/${card.id}"), context, MainActivity::class.java).apply {
@@ -114,7 +114,7 @@ object ShortcutHelper {
 
     fun updateDynamicShortcuts(context: Context, cards: List<CardEntity>) {
         val shortcuts = cards.take(4).map { card ->
-            val brandInfo = BrandHelper.getBrandInfo(card.name)
+            val brandInfo = BrandHelper.getBrandInfo(card.name, card.customLogoPath)
             val icon = createShortcutIcon(context, card.name, brandInfo)
 
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("mycards://card/${card.id}"), context, MainActivity::class.java).apply {

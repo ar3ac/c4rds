@@ -40,7 +40,10 @@ object BrandHelper {
         return knownBrands + cloud
     }
 
-    fun getBrandInfo(cardName: String): BrandInfo {
+    fun getBrandInfo(cardName: String, customLogoPath: String? = null): BrandInfo {
+        if (customLogoPath != null) {
+            return BrandInfo(cardName, null, customLogoPath)
+        }
         val nameLower = cardName.trim().lowercase()
 
         // Prima controlliamo i brand hardcoded locali per massima priorità

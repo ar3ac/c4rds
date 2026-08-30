@@ -142,7 +142,7 @@ fun CardDetailScreen(
                     height = 600
                 )
             }
-            val brandInfo = remember(currentCard.name) { BrandHelper.getBrandInfo(currentCard.name) }
+            val brandInfo = remember(currentCard.name, currentCard.customLogoPath) { BrandHelper.getBrandInfo(currentCard.name, currentCard.customLogoPath) }
 
             Column(
                 modifier = Modifier

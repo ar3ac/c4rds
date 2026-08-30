@@ -32,6 +32,8 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import androidx.compose.ui.platform.LocalContext
 import com.example.mycards.utils.BarcodeGenerator
 import com.example.mycards.utils.BrandHelper
 import com.example.mycards.utils.BrandInfo
@@ -44,11 +46,16 @@ fun AddEditCardScreen(
     onBackClick: () -> Unit
 ) {
     var showBrandSelectorDialog by remember { mutableStateOf(false) }
+    var showWebLogoSearchDialog by remember { mutableStateOf(false) }
     var expandedDropdown by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
     // Rileva automaticamente se il nome attualmente digitato corrisponde a un logo conosciuto
-    val currentBrandInfo = remember(viewModel.name) { BrandHelper.getBrandInfo(viewModel.name) }
+    val currentBrandInfo = remember(viewModel.name, viewModel.customLogoPath) { 
+        BrandHelper.getBrandInfo(viewModel.name, viewModel.customLogoPath) 
+    }
+    
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -102,9 +109,16 @@ fun AddEditCardScreen(
                             modifier = Modifier
                                 .size(28.dp)
                                 .clip(CircleShape)
+                                .clickable { showWebLogoSearchDialog = true }
                         )
                     }
-                } else null,
+                } else {
+                    {
+                        IconButton(onClick = { showWebLogoSearchDialog = true }) {
+                            Icon(Icons.Default.Search, contentDescription = "Cerca logo sul web")
+                        }
+                    }
+                },
                 trailingIcon = {
                     IconButton(onClick = { showBrandSelectorDialog = true }) {
                         Icon(
@@ -263,6 +277,17 @@ fun AddEditCardScreen(
                 }
             )
         }
+
+        if (showWebLogoSearchDialog) {
+            WebLogoSearchDialog(
+                viewModel = viewModel,
+                onDismiss = { showWebLogoSearchDialog = false },
+                onLogoSelected = { logoUrl ->
+                    viewModel.downloadAndSetCustomLogo(context, logoUrl)
+                    showWebLogoSearchDialog = false
+                }
+            )
+        }
     }
 }
 
@@ -351,6 +376,126 @@ fun BrandSelectorDialog(
                                     overflow = TextOverflow.Ellipsis,
                                     textAlign = TextAlign.Center
                                 )
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Annulla")
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun WebLogoSearchDialog(
+    viewModel: AddEditViewModel,
+    onDismiss: () -> Unit,
+    onLogoSelected: (String) -> Unit
+) {
+    var searchQuery by remember { mutableStateOf(viewModel.name) }
+
+    LaunchedEffect(Unit) {
+        if (searchQuery.isNotBlank()) {
+            viewModel.searchWebLogos(searchQuery)
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Cerca Logo Web",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 400.dp)
+            ) {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = { Text("Nome negozio o dominio...") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    trailingIcon = {
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { searchQuery = "" }) {
+                                Icon(Icons.Default.Clear, contentDescription = "Pulisci")
+                            }
+                        }
+                    },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                )
+
+                Button(
+                    onClick = { viewModel.searchWebLogos(searchQuery) },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = searchQuery.isNotBlank() && !viewModel.isSearchingLogo
+                ) {
+                    Text(if (viewModel.isSearchingLogo) "Ricerca in corso..." else "Cerca")
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (viewModel.isSearchingLogo) {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                } else if (viewModel.logoSearchResults.isEmpty()) {
+                    Text(
+                        "Nessun risultato. Prova a inserire il nome esatto del negozio (es. 'esselunga').",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                    )
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(3),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(viewModel.logoSearchResults) { result ->
+                            Surface(
+                                onClick = { onLogoSelected(result.logoUrl) },
+                                shape = RoundedCornerShape(12.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.padding(8.dp)
+                                ) {
+                                    AsyncImage(
+                                        model = result.logoUrl,
+                                        contentDescription = result.name,
+                                        modifier = Modifier
+                                            .size(44.dp)
+                                            .clip(CircleShape),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Text(
+                                        text = result.domain,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         }
                     }
