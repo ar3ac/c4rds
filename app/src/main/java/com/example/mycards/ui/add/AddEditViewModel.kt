@@ -1,6 +1,9 @@
 package com.example.mycards.ui.add
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -154,15 +157,23 @@ class AddEditViewModel(
                 connection.connectTimeout = 5000
                 connection.readTimeout = 5000
                 val bytes = connection.inputStream.readBytes()
-                val filename = "custom_logo_${System.currentTimeMillis()}.png"
-                val logosDir = File(context.filesDir, "custom_logos")
-                if (!logosDir.exists()) logosDir.mkdirs()
                 
-                val file = File(logosDir, filename)
-                file.writeBytes(bytes)
-                
-                withContext(Dispatchers.Main) {
-                    customLogoPath = file.absolutePath
+                // Ritaglia la trasparenza in eccesso
+                var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                if (bitmap != null) {
+                    bitmap = cropTransparentBorders(bitmap)
+                    val filename = "custom_logo_${System.currentTimeMillis()}.png"
+                    val logosDir = File(context.filesDir, "custom_logos")
+                    if (!logosDir.exists()) logosDir.mkdirs()
+                    
+                    val file = File(logosDir, filename)
+                    file.outputStream().use { out ->
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                    }
+                    
+                    withContext(Dispatchers.Main) {
+                        customLogoPath = file.absolutePath
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("AddEditViewModel", "Error downloading custom logo", e)
@@ -170,7 +181,50 @@ class AddEditViewModel(
         }
     }
 
-    fun copyUriAndSetCustomLogo(context: Context, uri: android.net.Uri) {
+    private fun cropTransparentBorders(bitmap: Bitmap): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+        val pixels = IntArray(width * height)
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+
+        var minX = width
+        var minY = height
+        var maxX = -1
+        var maxY = -1
+
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val alpha = (pixels[y * width + x] ushr 24) and 0xff
+                if (alpha > 10) { // Tolleranza per pixel quasi trasparenti
+                    if (x < minX) minX = x
+                    if (x > maxX) maxX = x
+                    if (y < minY) minY = y
+                    if (y > maxY) maxY = y
+                }
+            }
+        }
+
+        if (maxX < minX || maxY < minY) {
+            return bitmap // L'immagine è vuota o completamente trasparente
+        }
+
+        // Aggiungi un piccolissimo padding (es. 4 pixel) per non tagliare troppo a filo
+        val padding = 4
+        minX = maxOf(0, minX - padding)
+        minY = maxOf(0, minY - padding)
+        maxX = minOf(width - 1, maxX + padding)
+        maxY = minOf(height - 1, maxY + padding)
+
+        val newWidth = maxX - minX + 1
+        val newHeight = maxY - minY + 1
+        
+        // Se il ritaglio è inutile (immagine già a filo), evitalo
+        if (newWidth == width && newHeight == height) return bitmap
+
+        return Bitmap.createBitmap(bitmap, minX, minY, newWidth, newHeight)
+    }
+
+    fun copyUriAndSetCustomLogo(context: Context, uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val inputStream = context.contentResolver.openInputStream(uri)
