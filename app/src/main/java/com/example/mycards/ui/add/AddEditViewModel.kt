@@ -149,7 +149,11 @@ class AddEditViewModel(
     fun downloadAndSetCustomLogo(context: Context, logoUrl: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val bytes = URL(logoUrl).readBytes()
+                val connection = URL(logoUrl).openConnection() as java.net.HttpURLConnection
+                connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                connection.connectTimeout = 5000
+                connection.readTimeout = 5000
+                val bytes = connection.inputStream.readBytes()
                 val filename = "custom_logo_${System.currentTimeMillis()}.png"
                 val logosDir = File(context.filesDir, "custom_logos")
                 if (!logosDir.exists()) logosDir.mkdirs()

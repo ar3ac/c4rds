@@ -535,7 +535,11 @@ fun WebLogoSearchDialog(
                                     modifier = Modifier.padding(8.dp)
                                 ) {
                                     AsyncImage(
-                                        model = result.logoUrl,
+                                        model = coil.request.ImageRequest.Builder(LocalContext.current)
+                                            .data(result.logoUrl)
+                                            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                                            .crossfade(true)
+                                            .build(),
                                         contentDescription = result.name,
                                         modifier = Modifier
                                             .size(44.dp)
