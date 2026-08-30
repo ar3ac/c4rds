@@ -15,7 +15,8 @@ data class BackupCardDto(
     @SerializedName("barcodeValue") val barcodeValue: String,
     @SerializedName("barcodeFormat") val barcodeFormat: String,
     @SerializedName("favorite") val favorite: Boolean = false,
-    @SerializedName("owner") val owner: String? = ""
+    @SerializedName("owner") val owner: String? = "",
+    @SerializedName("customLogoBase64") val customLogoBase64: String? = null
 )
 
 data class BackupDataDto(
@@ -30,12 +31,20 @@ object BackupManager {
     suspend fun exportToJson(context: Context, uri: Uri, cards: List<CardEntity>): Result<Unit> {
         return runCatching {
             val dtos = cards.map { card ->
+                val base64Logo = card.customLogoPath?.let { path ->
+                    val file = java.io.File(path)
+                    if (file.exists()) {
+                        android.util.Base64.encodeToString(file.readBytes(), android.util.Base64.NO_WRAP)
+                    } else null
+                }
+
                 BackupCardDto(
                     name = card.name,
                     barcodeValue = card.barcodeValue,
                     barcodeFormat = card.barcodeFormat,
                     favorite = card.favorite,
-                    owner = card.owner
+                    owner = card.owner,
+                    customLogoBase64 = base64Logo
                 )
             }
             val backupData = BackupDataDto(version = 1, cards = dtos)
@@ -65,12 +74,28 @@ object BackupManager {
             }
 
             backupData.cards.map { dto ->
+                var customLogoPath: String? = null
+                if (!dto.customLogoBase64.isNullOrBlank()) {
+                    try {
+                        val bytes = android.util.Base64.decode(dto.customLogoBase64, android.util.Base64.NO_WRAP)
+                        val filename = "custom_logo_${System.currentTimeMillis()}_${java.util.UUID.randomUUID().toString().take(5)}.png"
+                        val logosDir = java.io.File(context.filesDir, "custom_logos")
+                        if (!logosDir.exists()) logosDir.mkdirs()
+                        val file = java.io.File(logosDir, filename)
+                        file.writeBytes(bytes)
+                        customLogoPath = file.absolutePath
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
                 CardEntity(
                     name = dto.name.ifBlank { "Senza Nome" },
                     barcodeValue = dto.barcodeValue,
                     barcodeFormat = dto.barcodeFormat,
                     favorite = dto.favorite,
-                    owner = dto.owner ?: ""
+                    owner = dto.owner ?: "",
+                    customLogoPath = customLogoPath
                 )
             }
         }
@@ -79,12 +104,20 @@ object BackupManager {
     fun shareDatabase(context: Context, cards: List<CardEntity>) {
         try {
             val dtos = cards.map { card ->
+                val base64Logo = card.customLogoPath?.let { path ->
+                    val file = java.io.File(path)
+                    if (file.exists()) {
+                        android.util.Base64.encodeToString(file.readBytes(), android.util.Base64.NO_WRAP)
+                    } else null
+                }
+
                 BackupCardDto(
                     name = card.name,
                     barcodeValue = card.barcodeValue,
                     barcodeFormat = card.barcodeFormat,
                     favorite = card.favorite,
-                    owner = card.owner
+                    owner = card.owner,
+                    customLogoBase64 = base64Logo
                 )
             }
             val backupData = BackupDataDto(version = 1, cards = dtos)
