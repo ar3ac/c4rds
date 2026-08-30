@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.Search
@@ -57,6 +58,15 @@ fun AddEditCardScreen(
     }
     
     val context = LocalContext.current
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            viewModel.copyUriAndSetCustomLogo(context, uri)
+            showWebLogoSearchDialog = false
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -104,14 +114,33 @@ fun AddEditCardScreen(
                 placeholder = { Text("es. Esselunga, Iperal, Conad...") },
                 leadingIcon = if (currentBrandInfo.iconResId != null || currentBrandInfo.localFilePath != null) {
                     {
-                        com.example.mycards.ui.components.BrandIcon(
-                            brand = currentBrandInfo,
-                            contentDescription = null,
+                        Box(
+                            contentAlignment = Alignment.BottomEnd,
                             modifier = Modifier
-                                .size(28.dp)
                                 .clip(CircleShape)
                                 .clickable { showWebLogoSearchDialog = true }
-                        )
+                                .padding(4.dp)
+                        ) {
+                            com.example.mycards.ui.components.BrandIcon(
+                                brand = currentBrandInfo,
+                                contentDescription = "Cambia logo",
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                            )
+                            Surface(
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(14.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier.padding(2.dp)
+                                )
+                            }
+                        }
                     }
                 } else {
                     {
@@ -286,7 +315,8 @@ fun AddEditCardScreen(
                 onLogoSelected = { logoUrl ->
                     viewModel.downloadAndSetCustomLogo(context, logoUrl)
                     showWebLogoSearchDialog = false
-                }
+                },
+                onGalleryClick = { galleryLauncher.launch("image/*") }
             )
         }
     }
@@ -397,7 +427,8 @@ fun BrandSelectorDialog(
 fun WebLogoSearchDialog(
     viewModel: AddEditViewModel,
     onDismiss: () -> Unit,
-    onLogoSelected: (String) -> Unit
+    onLogoSelected: (String) -> Unit,
+    onGalleryClick: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf(viewModel.name) }
 
@@ -420,8 +451,29 @@ fun WebLogoSearchDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 400.dp)
+                    .heightIn(max = 500.dp)
             ) {
+                Button(
+                    onClick = onGalleryClick,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                ) {
+                    Icon(androidx.compose.material.icons.Icons.Default.Search, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Scegli un'immagine dalla Galleria")
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    "Oppure cerca sul Web (Favicon):",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },

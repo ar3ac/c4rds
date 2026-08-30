@@ -138,6 +138,30 @@ class AddEditViewModel(
         }
     }
 
+    fun copyUriAndSetCustomLogo(context: Context, uri: android.net.Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                if (inputStream != null) {
+                    val bytes = inputStream.readBytes()
+                    inputStream.close()
+                    val filename = "custom_logo_${System.currentTimeMillis()}.png"
+                    val logosDir = File(context.filesDir, "custom_logos")
+                    if (!logosDir.exists()) logosDir.mkdirs()
+                    
+                    val file = File(logosDir, filename)
+                    file.writeBytes(bytes)
+                    
+                    withContext(Dispatchers.Main) {
+                        customLogoPath = file.absolutePath
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("AddEditViewModel", "Error copying custom logo from gallery", e)
+            }
+        }
+    }
+
     fun saveCard(onSuccess: (Long) -> Unit) {
         if (name.isBlank()) {
             errorMessage = "Inserisci un nome per la tessera"
