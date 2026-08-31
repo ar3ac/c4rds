@@ -64,10 +64,26 @@ fun NavGraph(
         composable(Screen.Scan.route) {
             BarcodeScannerScreen(
                 onBarcodeDetected = { value, format ->
-                    navController.navigate(Screen.Add.createRoute(initialValue = value, initialFormat = format))
+                    val previousRoute = navController.previousBackStackEntry?.destination?.route
+                    if (previousRoute?.startsWith("add") == true) {
+                        navController.previousBackStackEntry?.savedStateHandle?.set("scanned_barcode", value)
+                        navController.previousBackStackEntry?.savedStateHandle?.set("scanned_format", format)
+                        navController.popBackStack()
+                    } else {
+                        navController.navigate(Screen.Add.createRoute(initialValue = value, initialFormat = format)) {
+                            popUpTo(Screen.Home.route)
+                        }
+                    }
                 },
                 onManualInputClick = {
-                    navController.navigate(Screen.Add.createRoute())
+                    val previousRoute = navController.previousBackStackEntry?.destination?.route
+                    if (previousRoute?.startsWith("add") == true) {
+                        navController.popBackStack()
+                    } else {
+                        navController.navigate(Screen.Add.createRoute()) {
+                            popUpTo(Screen.Home.route)
+                        }
+                    }
                 },
                 onBackClick = { navController.popBackStack() }
             )
@@ -105,6 +121,21 @@ fun NavGraph(
                 factory = AddEditViewModelFactory(repository, cardId, initialValue, initialFormat, initialName, initialOwner)
             )
 
+            val savedStateHandle = backStackEntry.savedStateHandle
+            val scannedBarcode = savedStateHandle.get<String>("scanned_barcode")
+            val scannedFormat = savedStateHandle.get<String>("scanned_format")
+
+            androidx.compose.runtime.LaunchedEffect(scannedBarcode, scannedFormat) {
+                if (scannedBarcode != null) {
+                    viewModel.onBarcodeValueChanged(scannedBarcode)
+                    savedStateHandle.remove<String>("scanned_barcode")
+                }
+                if (scannedFormat != null) {
+                    viewModel.onFormatSelected(scannedFormat)
+                    savedStateHandle.remove<String>("scanned_format")
+                }
+            }
+
             AddEditCardScreen(
                 viewModel = viewModel,
                 onSaveSuccess = { savedCardId ->
@@ -112,7 +143,8 @@ fun NavGraph(
                         popUpTo(Screen.Home.route)
                     }
                 },
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
+                onScanClick = { navController.navigate(Screen.Scan.route) }
             )
         }
 

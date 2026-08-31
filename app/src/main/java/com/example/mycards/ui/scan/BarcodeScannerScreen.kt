@@ -77,8 +77,16 @@ fun BarcodeScannerScreen(
                     .addOnSuccessListener { barcodes ->
                         if (barcodes.isNotEmpty()) {
                             val barcode = barcodes.first()
-                            val rawValue = barcode.rawValue ?: ""
-                            val formatStr = mapMlKitFormatToString(barcode.format)
+                            var rawValue = barcode.rawValue ?: ""
+                            
+                            var formatStr = mapMlKitFormatToString(barcode.format)
+                            
+                            // Fix per i codici UPC-A (aggiunge lo zero iniziale rimosso dallo standard americano)
+                            if (barcode.format == Barcode.FORMAT_UPC_A && rawValue.length == 12) {
+                                rawValue = "0$rawValue"
+                                formatStr = "EAN_13"
+                            }
+                            
                             onBarcodeDetected(rawValue, formatStr)
                         } else {
                             android.widget.Toast.makeText(context, "Nessun barcode rilevato nell'immagine", android.widget.Toast.LENGTH_SHORT).show()
@@ -272,9 +280,18 @@ fun CameraPreviewWithAnalyzer(
 
                                         if (rawValue != null && rawValue.trim().isNotEmpty() && !isDetected && isInsideTarget) {
                                             isDetected = true
-                                            val formatStr = mapMlKitFormatToString(barcode.format)
-                                            android.util.Log.d("BarcodeScanner", "Scanned: $rawValue ($formatStr)")
-                                            onBarcodeDetected(rawValue, formatStr)
+                                            
+                                            var formatStr = mapMlKitFormatToString(barcode.format)
+                                            
+                                            // Fix per i codici UPC-A (aggiunge lo zero iniziale rimosso)
+                                            var finalRawValue = rawValue
+                                            if (barcode.format == Barcode.FORMAT_UPC_A && finalRawValue.length == 12) {
+                                                finalRawValue = "0$finalRawValue"
+                                                formatStr = "EAN_13"
+                                            }
+                                            
+                                            android.util.Log.d("BarcodeScanner", "Scanned: $finalRawValue ($formatStr)")
+                                            onBarcodeDetected(finalRawValue, formatStr)
                                             break
                                         }
                                     }

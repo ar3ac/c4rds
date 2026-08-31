@@ -47,7 +47,8 @@ import com.example.mycards.utils.BrandInfo
 fun AddEditCardScreen(
     viewModel: AddEditViewModel,
     onSaveSuccess: (cardId: Long) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onScanClick: () -> Unit = {}
 ) {
     var showBrandSelectorDialog by remember { mutableStateOf(false) }
     var showWebLogoSearchDialog by remember { mutableStateOf(false) }
@@ -192,7 +193,9 @@ fun AddEditCardScreen(
                 },
                 label = { Text("Valore Codice a Barre / QR") },
                 trailingIcon = {
-                    Icon(Icons.Default.QrCode, contentDescription = null)
+                    IconButton(onClick = onScanClick) {
+                        Icon(Icons.Default.QrCode, contentDescription = "Scansiona da fotocamera")
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
