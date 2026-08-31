@@ -18,7 +18,13 @@ object BarcodeGenerator {
     ): Bitmap? {
         if (value.isBlank()) return null
 
-        val zxingFormat = mapFormatNameToZxing(formatName) ?: BarcodeFormat.CODE_128
+        var zxingFormat = mapFormatNameToZxing(formatName) ?: BarcodeFormat.CODE_128
+        
+        // Retro-compatibility fix: If a card was saved as UPC_A but has 13 digits (starts with 0), ZXing will crash.
+        // We seamlessly convert it to EAN_13 at render time.
+        if (zxingFormat == BarcodeFormat.UPC_A && value.length == 13) {
+            zxingFormat = BarcodeFormat.EAN_13
+        }
 
         val actualHeight = if (zxingFormat == BarcodeFormat.QR_CODE || zxingFormat == BarcodeFormat.DATA_MATRIX) {
             width
