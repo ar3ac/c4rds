@@ -23,7 +23,7 @@ Built with modern Android engineering: Kotlin, Jetpack Compose, Material 3, Room
 
 ## 🚀 Key Features
 
-- 🔒 **Privacy-First & 100% Offline**: Your cards, barcodes, and backups remain strictly on your device. No user accounts, no analytics, no ad tracking, and no proprietary cloud SDKs.
+- 🔒 **Privacy-First & Offline-First**: Your cards, barcodes, and backups remain strictly on your device. Internet access is used exclusively to fetch public brand logos. No user accounts, no analytics, no ad tracking, and no proprietary cloud SDKs.
 - 📸 **100% Open-Source Barcode & QR Scanner**: Powered by **CameraX** and **ZXing Core** (`com.google.zxing:core`).
   - Sensor-rotation aware (handles 0°, 90°, 180°, and 270° orientations seamlessly).
   - Handles CameraX memory rowStride buffer alignment cleanly.

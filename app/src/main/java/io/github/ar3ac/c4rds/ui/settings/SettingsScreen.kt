@@ -191,9 +191,10 @@ fun SettingsScreen(
                     }
 
                     Text(
-                        text = "• App 100% Offline: Nessun permesso INTERNET richiesto.\n" +
-                                "• Zero Tracciamento: Nessuna analisi, pubblicità o Firebase.\n" +
-                                "• I tuoi dati rimangono esclusivamente nel tuo dispositivo.\n" +
+                        text = "• Architettura Offline-First: Le tue carte e scansioni funzionano sempre, anche senza rete.\n" +
+                                "• Rete Internet: Usata unicamente per sincronizzare i loghi dei marchi in background.\n" +
+                                "• Zero Tracciamento: Nessuna analisi, profilazione, pubblicità o Firebase.\n" +
+                                "• Dati Privati: Le tue tessere e codici a barre non lasciano mai il tuo dispositivo.\n" +
                                 "• Android Auto Backup: Le tue tessere sono protette anche dai backup di sistema Android.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
