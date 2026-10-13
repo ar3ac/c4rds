@@ -29,7 +29,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import io.github.ar3ac.c4rds.R
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,23 +61,23 @@ fun CardDetailScreen(
     val copyToClipboard = {
         currentCard?.let { card ->
             clipboardManager.setText(AnnotatedString(card.barcodeValue))
-            Toast.makeText(context, "Codice copiato negli appunti!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.code_copied), Toast.LENGTH_SHORT).show()
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(currentCard?.name ?: "Dettaglio Tessera") },
+                title = { Text(currentCard?.name ?: stringResource(R.string.card_detail_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
                     if (currentCard != null) {
                         IconButton(onClick = { ShortcutHelper.createCardShortcut(context, currentCard) }) {
-                            Icon(Icons.AutoMirrored.Filled.Shortcut, contentDescription = "Aggiungi alla Home")
+                            Icon(Icons.AutoMirrored.Filled.Shortcut, contentDescription = stringResource(R.string.menu_add_to_home))
                         }
                         IconButton(onClick = {
                             val sendIntent: Intent = Intent().apply {
@@ -86,36 +88,36 @@ fun CardDetailScreen(
                                 val safeOwner = android.net.Uri.encode(currentCard.owner)
                                 val shareLink = "https://ar3ac.github.io/c4rds-share/create/?name=$safeName&barcode=$safeBarcode&format=$safeFormat&owner=$safeOwner"
                                 
-                                val text = "Ecco la mia tessera: *${currentCard.name}*\nCodice: ${currentCard.barcodeValue}\n\n$shareLink"
+                                val text = context.getString(R.string.share_card_text, currentCard.name, currentCard.barcodeValue, shareLink)
                                 putExtra(Intent.EXTRA_TEXT, text)
                                 type = "text/plain"
                             }
-                            val shareIntent = Intent.createChooser(sendIntent, "Condividi tessera tramite...")
+                            val shareIntent = Intent.createChooser(sendIntent, context.getString(R.string.share_chooser_title))
                             context.startActivity(shareIntent)
                         }) {
-                            Icon(Icons.Default.Share, contentDescription = "Condividi Tessera")
+                            Icon(Icons.Default.Share, contentDescription = stringResource(R.string.share))
                         }
                         IconButton(onClick = { copyToClipboard() }) {
-                            Icon(Icons.Default.ContentCopy, contentDescription = "Copia Codice")
+                            Icon(Icons.Default.ContentCopy, contentDescription = stringResource(R.string.copy))
                         }
                         IconButton(onClick = {
                             viewModel.toggleFavorite {
-                                Toast.makeText(context, "Puoi avere al massimo 3 tessere preferite per i comandi rapidi.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.favorite_max_limit), Toast.LENGTH_SHORT).show()
                             }
                         }) {
                             Icon(
                                 imageVector = if (currentCard.favorite) Icons.Default.Star else Icons.Outlined.StarOutline,
-                                contentDescription = "Preferito",
+                                contentDescription = stringResource(R.string.favorite_toggle),
                                 tint = if (currentCard.favorite) Color(0xFFFFB800) else MaterialTheme.colorScheme.onSurface
                             )
                         }
                         IconButton(onClick = { onEditClick(currentCard.id) }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Modifica")
+                            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
                         }
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
                                 Icons.Default.Delete,
-                                contentDescription = "Elimina",
+                                contentDescription = stringResource(R.string.delete),
                                 tint = MaterialTheme.colorScheme.error
                             )
                         }
@@ -219,7 +221,7 @@ fun CardDetailScreen(
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Icon(
                                     imageVector = Icons.Default.ContentCopy,
-                                    contentDescription = "Copia codice negli appunti",
+                                    contentDescription = stringResource(R.string.copy),
                                     tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -232,7 +234,7 @@ fun CardDetailScreen(
 
                 // Formato del codice a barre
                 Text(
-                    text = "Formato: ${currentCard.barcodeFormat}",
+                    text = stringResource(R.string.format_label, currentCard.barcodeFormat),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     textAlign = TextAlign.Center
@@ -298,8 +300,8 @@ fun CardDetailScreen(
         if (showDeleteDialog && currentCard != null) {
             AlertDialog(
                 onDismissRequest = { showDeleteDialog = false },
-                title = { Text("Eliminare la tessera?") },
-                text = { Text("Sei sicuro di voler eliminare permanentemente \"${currentCard.name}\"?") },
+                title = { Text(stringResource(R.string.delete_card_title)) },
+                text = { Text(stringResource(R.string.delete_card_message, currentCard.name)) },
                 confirmButton = {
                     TextButton(
                         onClick = {
@@ -307,12 +309,12 @@ fun CardDetailScreen(
                             viewModel.deleteCard(onDeleted = onBackClick)
                         }
                     ) {
-                        Text("Elimina", color = MaterialTheme.colorScheme.error)
+                        Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showDeleteDialog = false }) {
-                        Text("Annulla")
+                        Text(stringResource(R.string.cancel))
                     }
                 }
             )

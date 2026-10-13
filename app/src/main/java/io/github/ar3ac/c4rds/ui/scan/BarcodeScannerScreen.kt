@@ -30,10 +30,12 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import io.github.ar3ac.c4rds.R
 import java.util.concurrent.Executors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,20 +88,20 @@ fun BarcodeScannerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Scansiona Barcode") },
+                title = { Text(stringResource(R.string.scan_barcode_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
                     IconButton(onClick = { galleryLauncher.launch("image/*") }) {
-                        Icon(Icons.Default.PhotoLibrary, contentDescription = "Scegli da Galleria")
+                        Icon(Icons.Default.PhotoLibrary, contentDescription = stringResource(R.string.scan_from_gallery))
                     }
                     TextButton(onClick = onManualInputClick) {
                         Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Manuale")
+                        Text(stringResource(R.string.manual_entry))
                     }
                 }
             )
@@ -118,7 +120,7 @@ fun BarcodeScannerScreen(
                 // Overlay rimosso (già gestito da CameraPreviewWithAnalyzer)
 
                 Text(
-                    text = "Inquadra il codice a barre o QR",
+                    text = stringResource(R.string.scan_viewfinder_hint),
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White,
                     modifier = Modifier
@@ -146,12 +148,12 @@ fun BarcodeScannerScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Permesso Fotocamera Richiesto",
+                        text = stringResource(R.string.camera_permission_required),
                         style = MaterialTheme.typography.titleLarge
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "L'app necessita dell'accesso alla fotocamera esclusivamente per leggere i codici a barre delle tue tessere.",
+                        text = stringResource(R.string.camera_permission_desc),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -159,11 +161,11 @@ fun BarcodeScannerScreen(
                     Button(
                         onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) }
                     ) {
-                        Text("Concedi Permesso")
+                        Text(stringResource(R.string.grant_permission))
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     OutlinedButton(onClick = onManualInputClick) {
-                        Text("Inserisci Manualmente")
+                        Text(stringResource(R.string.manual_entry))
                     }
                 }
             }

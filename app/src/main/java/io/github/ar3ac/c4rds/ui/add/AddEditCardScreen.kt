@@ -27,7 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import io.github.ar3ac.c4rds.R
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
@@ -74,10 +76,10 @@ fun AddEditCardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (viewModel.isEditMode) "Modifica Tessera" else "Nuova Tessera") },
+                title = { Text(if (viewModel.isEditMode) stringResource(R.string.edit_card_title) else stringResource(R.string.new_card_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -113,8 +115,8 @@ fun AddEditCardScreen(
                     viewModel.name = it
                     viewModel.errorMessage = null
                 },
-                label = { Text("Nome Tessera / Supermercato") },
-                placeholder = { Text("es. Esselunga, Iperal, Conad...") },
+                label = { Text(stringResource(R.string.store_brand_name)) },
+                placeholder = { Text(stringResource(R.string.store_brand_name_hint)) },
                 leadingIcon = if (currentBrandInfo.iconResId != null || currentBrandInfo.localFilePath != null) {
                     {
                         Box(
@@ -126,7 +128,7 @@ fun AddEditCardScreen(
                         ) {
                             io.github.ar3ac.c4rds.ui.components.BrandIcon(
                                 brand = currentBrandInfo,
-                                contentDescription = "Cambia logo",
+                                contentDescription = null,
                                 modifier = Modifier
                                     .size(32.dp)
                                     .clip(CircleShape)
@@ -148,7 +150,7 @@ fun AddEditCardScreen(
                 } else {
                     {
                         IconButton(onClick = { showWebLogoSearchDialog = true }) {
-                            Icon(Icons.Default.Search, contentDescription = "Cerca logo sul web")
+                            Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search_logo_online))
                         }
                     }
                 },
@@ -156,7 +158,7 @@ fun AddEditCardScreen(
                     IconButton(onClick = { showBrandSelectorDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = "Cerca o seleziona tra i marchi principali"
+                            contentDescription = stringResource(R.string.select_brand_logo)
                         )
                     }
                 },
@@ -172,8 +174,8 @@ fun AddEditCardScreen(
             OutlinedTextField(
                 value = viewModel.owner,
                 onValueChange = { viewModel.owner = it },
-                label = { Text("Nickname / Note") },
-                placeholder = { Text("es. Nome, Personale, Aziendale") },
+                label = { Text(stringResource(R.string.nickname_notes)) },
+                placeholder = { Text(stringResource(R.string.nickname_notes_hint)) },
                 leadingIcon = {
                     Icon(Icons.Default.EditNote, contentDescription = null)
                 },
@@ -191,10 +193,10 @@ fun AddEditCardScreen(
                 onValueChange = {
                     viewModel.onBarcodeValueChanged(it)
                 },
-                label = { Text("Valore Codice a Barre / QR") },
+                label = { Text(stringResource(R.string.barcode_value)) },
                 trailingIcon = {
                     IconButton(onClick = onScanClick) {
-                        Icon(Icons.Default.QrCode, contentDescription = "Scansiona da fotocamera")
+                        Icon(Icons.Default.QrCode, contentDescription = stringResource(R.string.scan_barcode))
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -213,7 +215,7 @@ fun AddEditCardScreen(
                     value = viewModel.barcodeFormat,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Formato Barcode (Rilevato/Selezionato)") },
+                    label = { Text(stringResource(R.string.barcode_format)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedDropdown) },
                     colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                     modifier = Modifier
@@ -265,13 +267,8 @@ fun AddEditCardScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
-                                text = "Preferiti",
+                                text = stringResource(R.string.mark_as_favorite),
                                 style = MaterialTheme.typography.titleMedium
-                            )
-                            Text(
-                                text = "Mostra in cima e nelle scorciatoie rapide",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -287,7 +284,7 @@ fun AddEditCardScreen(
             // Pulsante Salva
             Button(
                 onClick = {
-                    viewModel.saveCard { id ->
+                    viewModel.saveCard(context) { id ->
                         onSaveSuccess(id)
                     }
                 },
@@ -296,7 +293,7 @@ fun AddEditCardScreen(
                     .height(52.dp)
             ) {
                 Text(
-                    text = if (viewModel.isEditMode) "Aggiorna Tessera" else "Salva Tessera",
+                    text = stringResource(R.string.save_card_button),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -348,7 +345,7 @@ fun BrandSelectorDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Seleziona Supermercato / Brand",
+                text = stringResource(R.string.select_brand_logo),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -362,12 +359,12 @@ fun BrandSelectorDialog(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    placeholder = { Text("Filtra brand...") },
+                    placeholder = { Text(stringResource(R.string.filter_brands_hint)) },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {
                             IconButton(onClick = { searchQuery = "" }) {
-                                Icon(Icons.Default.Clear, contentDescription = "Pulisci")
+                                Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.cancel))
                             }
                         }
                     },
@@ -421,7 +418,7 @@ fun BrandSelectorDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Annulla")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
@@ -447,7 +444,7 @@ fun WebLogoSearchDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Cerca Logo Web",
+                text = stringResource(R.string.search_logo_web_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -465,7 +462,7 @@ fun WebLogoSearchDialog(
                 ) {
                     Icon(androidx.compose.material.icons.Icons.Default.Search, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Scegli un'immagine dalla Galleria")
+                    Text(stringResource(R.string.choose_image_gallery))
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -473,7 +470,7 @@ fun WebLogoSearchDialog(
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 Text(
-                    "Oppure cerca sul Web (Favicon):",
+                    stringResource(R.string.or_search_web),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -482,12 +479,12 @@ fun WebLogoSearchDialog(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    placeholder = { Text("Nome negozio o dominio...") },
+                    placeholder = { Text(stringResource(R.string.store_or_domain_hint)) },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {
                             IconButton(onClick = { searchQuery = "" }) {
-                                Icon(Icons.Default.Clear, contentDescription = "Pulisci")
+                                Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.cancel))
                             }
                         }
                     },
@@ -502,7 +499,7 @@ fun WebLogoSearchDialog(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = searchQuery.isNotBlank() && !viewModel.isSearchingLogo
                 ) {
-                    Text(if (viewModel.isSearchingLogo) "Ricerca in corso..." else "Cerca")
+                    Text(if (viewModel.isSearchingLogo) stringResource(R.string.searching) else stringResource(R.string.search_button))
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -513,7 +510,7 @@ fun WebLogoSearchDialog(
                     }
                 } else if (viewModel.logoSearchResults.isEmpty()) {
                     Text(
-                        "Nessun risultato. Prova a inserire il nome esatto del negozio (es. 'esselunga').",
+                        stringResource(R.string.no_logo_results),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -567,7 +564,7 @@ fun WebLogoSearchDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Annulla")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

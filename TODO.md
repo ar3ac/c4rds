@@ -24,6 +24,7 @@
 - [x] Step 17: Struttura metadati Fastlane (`it-IT`, `en-US`) per pubblicazione F-Droid.
 - [x] Step 18: Scansione barcode da Immagine / Galleria.
 - [x] Step 19: Supporto donazioni / "Buy me a coffee" via Ko-fi integrato nelle Impostazioni e nel README.
+- [x] Step 20: Internazionalizzazione completa (i18n): catalogo stringhe multilingua con Inglese come default (per F-Droid e utenti globali) e Italiano completo (`values-it`).
 
 ---
 

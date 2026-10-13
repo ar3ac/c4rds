@@ -1,0 +1,107 @@
+<resources>
+    <!-- App & General -->
+    <string name="app_name">C4rds</string>
+    <string name="app_wallet_title">C4rds Wallet</string>
+    <string name="back">Indietro</string>
+    <string name="cancel">Annulla</string>
+    <string name="delete">Elimina</string>
+    <string name="edit">Modifica</string>
+    <string name="save">Salva</string>
+    <string name="share">Condividi</string>
+    <string name="copy">Copia</string>
+    <string name="search_placeholder">Cerca tessera o nickname…</string>
+    <string name="settings">Impostazioni</string>
+    <string name="add_card">Aggiungi carta</string>
+    <string name="shortcut_add_card_short">Aggiungi carta</string>
+    <string name="shortcut_add_card_long">Aggiungi nuova tessera fedeltà su C4rds</string>
+
+    <!-- Home Screen -->
+    <string name="no_cards_found">Nessuna tessera trovata</string>
+    <string name="no_cards_hint">Aggiungi la tua prima carta con il tasto +</string>
+    <string name="no_results_for">Nessun risultato per \"%s\"</string>
+    <string name="add_new_card_title">Aggiungi nuova tessera</string>
+    <string name="scan_with_camera">Scansiona con Fotocamera</string>
+    <string name="scan_with_camera_desc">Inquadra il codice a barre della tua carta</string>
+    <string name="manual_entry">Inserimento Manuale</string>
+    <string name="manual_entry_desc">Digita direttamente nome e codice</string>
+    <string name="menu_bring_to_top">Porta in cima</string>
+    <string name="menu_edit">Modifica</string>
+    <string name="menu_add_to_home">Aggiungi alla Home</string>
+    <string name="menu_share">Condividi</string>
+    <string name="menu_delete">Elimina</string>
+    <string name="reorder_handle">Trascina per riordinare</string>
+    <string name="favorite_toggle">Imposta preferito</string>
+
+    <!-- Card Detail Screen -->
+    <string name="card_detail_title">Dettaglio Tessera</string>
+    <string name="code_copied">Codice copiato negli appunti!</string>
+    <string name="format_label">Formato: %s</string>
+    <string name="share_chooser_title">Condividi tessera tramite…</string>
+    <string name="share_card_text">Ecco la mia tessera: *%1$s*\nCodice: %2$s\n\n%3$s</string>
+    <string name="delete_card_title">Elimina tessera</string>
+    <string name="delete_card_message">Sei sicuro di voler eliminare la tessera \"%s\"? L\'azione non può essere annullata.</string>
+    <string name="favorite_max_limit">Puoi avere al massimo 3 tessere preferite per i comandi rapidi.</string>
+
+    <!-- Add/Edit Screen -->
+    <string name="edit_card_title">Modifica Tessera</string>
+    <string name="new_card_title">Nuova Tessera</string>
+    <string name="store_brand_name">Nome negozio / Brand</string>
+    <string name="store_brand_name_hint">es. Esselunga, Conad, IKEA…</string>
+    <string name="nickname_notes">Nickname / Note</string>
+    <string name="nickname_notes_hint">Opzionale - es. Personale, Papà, Famiglia</string>
+    <string name="barcode_value">Codice a barre / Numero tessera</string>
+    <string name="barcode_value_hint">Inserisci il codice numerico o testo</string>
+    <string name="barcode_format">Formato codice a barre</string>
+    <string name="scan_barcode">Scansiona codice</string>
+    <string name="mark_as_favorite">Imposta come preferito</string>
+    <string name="save_card_button">Salva Tessera</string>
+    <string name="custom_logo">Logo Personalizzato</string>
+    <string name="choose_from_gallery">Scegli dalla galleria</string>
+    <string name="search_logo_online">Cerca logo online</string>
+    <string name="remove_custom_logo">Rimuovi logo personalizzato</string>
+    <string name="error_enter_name">Inserisci un nome per la tessera</string>
+    <string name="error_enter_barcode">Inserisci il valore del codice a barre</string>
+    <string name="select_brand_logo">Scegli Logo Ufficiale</string>
+    <string name="search_logo_web_title">Cerca Logo Web</string>
+    <string name="choose_image_gallery">Scegli un\'immagine dalla Galleria</string>
+    <string name="or_search_web">Oppure cerca sul Web (Favicon):</string>
+    <string name="store_or_domain_hint">Nome negozio o dominio…</string>
+    <string name="search_button">Cerca</string>
+    <string name="searching">Ricerca in corso…</string>
+    <string name="no_logo_results">Nessun risultato. Prova a inserire il nome esatto del negozio (es. \'esselunga\').</string>
+    <string name="filter_brands_hint">Filtra brand…</string>
+
+    <!-- Barcode Scanner Screen -->
+    <string name="scan_barcode_title">Scansiona Barcode</string>
+    <string name="camera_permission_required">Permesso Fotocamera Richiesto</string>
+    <string name="camera_permission_desc">L\'accesso alla fotocamera è necessario per inquadrare e riconoscere i codici a barre.</string>
+    <string name="grant_permission">Concedi Permesso</string>
+    <string name="scan_viewfinder_hint">Inquadra il codice a barre all\'interno del riquadro</string>
+    <string name="scan_from_gallery">Galleria</string>
+    <string name="scan_no_barcode_found">Nessun codice a barre trovato nell\'immagine selezionata</string>
+
+    <!-- Settings & Backup Screen -->
+    <string name="settings_title">Impostazioni e Backup</string>
+    <string name="manual_backup_title">Backup Manuale (JSON)</string>
+    <string name="manual_backup_desc">Esporta le tue tessere in un file JSON standard o ripristina un backup precedente tramite Storage Access Framework.</string>
+    <string name="export">Esporta</string>
+    <string name="import_title">Importa</string>
+    <string name="share_whole_wallet">Condividi intero Portafoglio Famiglia (.c4rds)</string>
+    <string name="privacy_security_title">Privacy &amp; Sicurezza</string>
+    <string name="privacy_points">• Architettura Offline-First: Le tue carte e scansioni funzionano sempre, anche senza rete.\n• Rete Internet: Usata unicamente per sincronizzare i loghi dei marchi in background.\n• Zero Tracciamento: Nessuna analisi, profilazione, pubblicità o Firebase.\n• Dati Privati: Le tue tessere e codici a barre non lasciano mai il tuo dispositivo.\n• Android Auto Backup: Le tue tessere sono protette anche dai backup di sistema Android.</string>
+    <string name="buy_me_a_coffee">☕ Buy me a coffee</string>
+    <string name="restore_dialog_title">Ripristino Tessere (%d trovate)</string>
+    <string name="restore_dialog_message">Come desideri importare le tessere dal file JSON?</string>
+    <string name="restore_merge">Unisci a quelle attuali</string>
+    <string name="restore_replace">Sostituisci tutte</string>
+    <string name="backup_export_success">Backup esportato con successo!</string>
+    <string name="backup_export_error">Errore durante l\'esportazione: %s</string>
+    <string name="backup_empty_file">Il file selezionato non contiene tessere.</string>
+    <string name="backup_import_error">Errore importazione: %s</string>
+    <string name="backup_restore_replace_success">Ripristinate %d tessere (database sostituito).</string>
+    <string name="backup_restore_merge_success">Aggiunte %d tessere al database esistente.</string>
+
+    <!-- Shortcuts -->
+    <string name="shortcut_not_supported">Scorciatoie non supportate sul tuo launcher</string>
+    <string name="shortcut_added">Scorciatoia aggiunta alla Home!</string>
+</resources>

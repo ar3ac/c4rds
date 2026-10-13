@@ -34,6 +34,7 @@ Built with modern Android engineering: Kotlin, Jetpack Compose, Material 3, Room
 - 💡 **Automatic Temporary Peak Brightness**: When viewing a card, screen brightness automatically boosts to 100% (`FLAG_KEEP_SCREEN_ON`) for instant readability at store self-checkouts. The original system brightness is immediately restored upon exiting.
 - ⚡ **Android App Shortcuts (Dynamic & Pinned)**: Long-press the app icon on the Android launcher to access your favorite cards instantly, or pin dedicated 1-tap shortcuts with official store icons directly to your home screen.
 - 🎨 **Modern Material 3 UI & Cloud Logos**: Clean, responsive layout with glassmorphic accents, brand search bar, and custom card reordering. Official store logos are cached locally and synchronized from a public static database (`brands.json`) with procedural color avatar fallbacks.
+- 🌐 **Full Internationalization (i18n)**: Default English interface for international and F-Droid users, with automatic native Italian localization (`values-it`).
 - 📦 **Open JSON Backup & Cross-Device Sharing**:
   - Full backup/restore via Android Storage Access Framework (SAF) using open `.c4rds` JSON format (with embedded Base64 custom logos).
   - Selective import options: "Add to existing" or "Replace all".

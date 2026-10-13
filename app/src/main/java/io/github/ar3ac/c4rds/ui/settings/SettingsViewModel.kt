@@ -29,10 +29,10 @@ class SettingsViewModel(
             val allCards = repository.allCards.first()
             val result = BackupManager.exportToJson(context, uri, allCards)
             result.onSuccess {
-                statusMessage = "Backup esportato con successo!"
+                statusMessage = context.getString(io.github.ar3ac.c4rds.R.string.backup_export_success)
                 isError = false
             }.onFailure { ex ->
-                statusMessage = "Errore durante l'esportazione: ${ex.localizedMessage}"
+                statusMessage = context.getString(io.github.ar3ac.c4rds.R.string.backup_export_error, ex.localizedMessage ?: "")
                 isError = true
             }
         }
@@ -50,14 +50,14 @@ class SettingsViewModel(
             val result = BackupManager.importFromJson(context, uri)
             result.onSuccess { cards ->
                 if (cards.isEmpty()) {
-                    statusMessage = "Il file selezionato non contiene tessere."
+                    statusMessage = context.getString(io.github.ar3ac.c4rds.R.string.backup_empty_file)
                     isError = true
                 } else {
                     pendingImportCards = cards
                     showImportDialog = true
                 }
             }.onFailure { ex ->
-                statusMessage = "Errore importazione: ${ex.localizedMessage}"
+                statusMessage = context.getString(io.github.ar3ac.c4rds.R.string.backup_import_error, ex.localizedMessage ?: "")
                 isError = true
             }
         }
@@ -69,18 +69,18 @@ class SettingsViewModel(
             io.github.ar3ac.c4rds.utils.ShortcutHelper.clearAllShortcuts(context)
             repository.deleteAllCards()
             repository.insertAll(cards)
-            statusMessage = "Ripristinate ${cards.size} tessere (database sostituito)."
+            statusMessage = context.getString(io.github.ar3ac.c4rds.R.string.backup_restore_replace_success, cards.size)
             isError = false
             pendingImportCards = null
             showImportDialog = false
         }
     }
 
-    fun confirmImportMerge() {
+    fun confirmImportMerge(context: Context) {
         val cards = pendingImportCards ?: return
         viewModelScope.launch {
             repository.insertAll(cards)
-            statusMessage = "Aggiunte ${cards.size} tessere al database esistente."
+            statusMessage = context.getString(io.github.ar3ac.c4rds.R.string.backup_restore_merge_success, cards.size)
             isError = false
             pendingImportCards = null
             showImportDialog = false

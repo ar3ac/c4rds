@@ -31,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -94,7 +95,7 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            "C4rds Wallet",
+                            stringResource(R.string.app_wallet_title),
                             fontWeight = FontWeight.ExtraBold,
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onSurface
@@ -106,7 +107,7 @@ fun HomeScreen(
                             .size(48.dp)
                             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), CircleShape)
                     ) {
-                        Icon(Icons.Default.Settings, contentDescription = "Impostazioni", tint = MaterialTheme.colorScheme.onSurface)
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings), tint = MaterialTheme.colorScheme.onSurface)
                     }
                 }
                 
@@ -116,12 +117,12 @@ fun HomeScreen(
                 OutlinedTextField(
                     value = viewModel.searchQuery,
                     onValueChange = { viewModel.searchQuery = it },
-                    placeholder = { Text("Cerca tessera o nickname...") },
+                    placeholder = { Text(stringResource(R.string.search_placeholder)) },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                     trailingIcon = {
                         if (viewModel.searchQuery.isNotEmpty()) {
                             IconButton(onClick = { viewModel.searchQuery = "" }) {
-                                Icon(Icons.Default.Clear, contentDescription = "Pulisci")
+                                Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.cancel))
                             }
                         }
                     },
@@ -141,7 +142,7 @@ fun HomeScreen(
             ExtendedFloatingActionButton(
                 onClick = { showAddDialog = true },
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text("Aggiungi carta") },
+                text = { Text(stringResource(R.string.add_card)) },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
@@ -349,7 +350,7 @@ fun CardItemRow(
 
             Icon(
                 imageVector = Icons.Default.DragHandle,
-                contentDescription = "Trascina per riordinare",
+                contentDescription = stringResource(R.string.reorder_handle),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier.padding(horizontal = 4.dp)
             )
@@ -357,36 +358,36 @@ fun CardItemRow(
             IconButton(onClick = onToggleFavorite) {
                 Icon(
                     imageVector = if (card.favorite) Icons.Default.Star else Icons.Outlined.StarOutline,
-                    contentDescription = "Preferita",
+                    contentDescription = stringResource(R.string.favorite_toggle),
                     tint = if (card.favorite) Color(0xFFFFB800) else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             Box {
                 IconButton(onClick = { menuExpanded = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "Altre opzioni")
+                    Icon(Icons.Default.MoreVert, contentDescription = null)
                 }
                 DropdownMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Aggiungi alla Home") },
+                        text = { Text(stringResource(R.string.menu_add_to_home)) },
                         onClick = {
                             menuExpanded = false
                             ShortcutHelper.createCardShortcut(context, card)
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Copia codice") },
+                        text = { Text(stringResource(R.string.copy)) },
                         onClick = {
                             menuExpanded = false
                             clipboardManager.setText(AnnotatedString(card.barcodeValue))
-                            Toast.makeText(context, "Codice copiato negli appunti!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.code_copied), Toast.LENGTH_SHORT).show()
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Condividi tessera") },
+                        text = { Text(stringResource(R.string.menu_share)) },
                         onClick = {
                             menuExpanded = false
                             val safeName = android.net.Uri.encode(card.name)
@@ -395,24 +396,24 @@ fun CardItemRow(
                             val safeOwner = android.net.Uri.encode(card.owner)
                             val shareLink = "https://ar3ac.github.io/c4rds-share/create/?name=$safeName&barcode=$safeBarcode&format=$safeFormat&owner=$safeOwner"
                             
-                            val text = "Ecco la mia tessera: *${card.name}*\nCodice: ${card.barcodeValue}\n\n$shareLink"
+                            val text = context.getString(R.string.share_card_text, card.name, card.barcodeValue, shareLink)
                             val sendIntent = Intent().apply {
                                 action = Intent.ACTION_SEND
                                 putExtra(Intent.EXTRA_TEXT, text)
                                 type = "text/plain"
                             }
-                            context.startActivity(Intent.createChooser(sendIntent, "Condividi tessera tramite..."))
+                            context.startActivity(Intent.createChooser(sendIntent, context.getString(R.string.share_chooser_title)))
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Modifica") },
+                        text = { Text(stringResource(R.string.menu_edit)) },
                         onClick = {
                             menuExpanded = false
                             onEdit()
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Elimina", color = MaterialTheme.colorScheme.error) },
+                        text = { Text(stringResource(R.string.menu_delete), color = MaterialTheme.colorScheme.error) },
                         onClick = {
                             menuExpanded = false
                             onDelete()
@@ -444,16 +445,16 @@ fun EmptyStateView(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = if (isSearch) "Nessuna tessera trovata" else "Nessuna tessera salvata",
+            text = if (isSearch) stringResource(R.string.no_cards_found) else stringResource(R.string.no_cards_found),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = if (isSearch)
-                "Prova a modificare i termini di ricerca."
+                stringResource(R.string.no_results_for, "")
             else
-                "Aggiungi le tue tessere fedeltà scansionando il barcode o inserendolo manualmente.",
+                stringResource(R.string.no_cards_hint),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -462,7 +463,7 @@ fun EmptyStateView(
             Button(onClick = onAddClick) {
                 Icon(Icons.Default.Add, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Aggiungi prima tessera")
+                Text(stringResource(R.string.add_card))
             }
         }
     }
@@ -476,7 +477,7 @@ fun AddCardOptionsDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Aggiungi nuova tessera") },
+        title = { Text(stringResource(R.string.add_new_card_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Card(
@@ -498,13 +499,13 @@ fun AddCardOptionsDialog(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(
-                                "Scansiona con Fotocamera",
+                                stringResource(R.string.scan_with_camera),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                             Text(
-                                "Inquadra il codice a barre della tua carta",
+                                stringResource(R.string.scan_with_camera_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                             )
@@ -531,12 +532,12 @@ fun AddCardOptionsDialog(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(
-                                "Inserimento Manuale",
+                                stringResource(R.string.manual_entry),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                "Digita direttamente nome e codice",
+                                stringResource(R.string.manual_entry_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -548,7 +549,7 @@ fun AddCardOptionsDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Annulla")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

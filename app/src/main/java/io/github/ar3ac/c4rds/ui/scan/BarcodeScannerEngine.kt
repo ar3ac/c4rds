@@ -134,7 +134,7 @@ class BarcodeScannerEngine {
             inputStream?.close()
 
             if (bitmap == null) {
-                onError("Impossibile caricare l'immagine")
+                onError(context.getString(io.github.ar3ac.c4rds.R.string.scan_no_barcode_found))
                 return
             }
 
@@ -157,9 +157,9 @@ class BarcodeScannerEngine {
 
             onSuccess(rawValue, formatStr)
         } catch (_: NotFoundException) {
-            onError("Nessun barcode rilevato nell'immagine")
+            onError(context.getString(io.github.ar3ac.c4rds.R.string.scan_no_barcode_found))
         } catch (e: Exception) {
-            onError("Errore durante l'analisi dell'immagine: ${e.message}")
+            onError(context.getString(io.github.ar3ac.c4rds.R.string.scan_no_barcode_found))
         } finally {
             reader.reset()
         }

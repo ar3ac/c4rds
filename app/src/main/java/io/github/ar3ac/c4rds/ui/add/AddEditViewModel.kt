@@ -251,13 +251,13 @@ class AddEditViewModel(
         }
     }
 
-    fun saveCard(onSuccess: (Long) -> Unit) {
+    fun saveCard(context: Context, onSuccess: (Long) -> Unit) {
         if (name.isBlank()) {
-            errorMessage = "Inserisci un nome per la tessera"
+            errorMessage = context.getString(io.github.ar3ac.c4rds.R.string.error_enter_name)
             return
         }
         if (barcodeValue.isBlank()) {
-            errorMessage = "Inserisci il valore del codice a barre"
+            errorMessage = context.getString(io.github.ar3ac.c4rds.R.string.error_enter_barcode)
             return
         }
 

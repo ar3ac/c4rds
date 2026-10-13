@@ -21,8 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import io.github.ar3ac.c4rds.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,10 +53,10 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Impostazioni e Backup") },
+                title = { Text(stringResource(R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -114,12 +116,12 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Backup Manuale (JSON)",
+                        text = stringResource(R.string.manual_backup_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Esporta le tue tessere in un file JSON standard o ripristina un backup precedente tramite Storage Access Framework.",
+                        text = stringResource(R.string.manual_backup_desc),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -139,7 +141,7 @@ fun SettingsScreen(
                         ) {
                             Icon(Icons.Default.Upload, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Esporta")
+                            Text(stringResource(R.string.export))
                         }
 
                         Button(
@@ -150,7 +152,7 @@ fun SettingsScreen(
                         ) {
                             Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Importa")
+                            Text(stringResource(R.string.import_title))
                         }
                     }
 
@@ -160,7 +162,7 @@ fun SettingsScreen(
                     ) {
                         Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Condividi intero Portafoglio Famiglia (.c4rds)")
+                        Text(stringResource(R.string.share_whole_wallet))
                     }
                 }
             }
@@ -184,18 +186,14 @@ fun SettingsScreen(
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "Privacy & Sicurezza",
+                            text = stringResource(R.string.privacy_security_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                     }
 
                     Text(
-                        text = "• Architettura Offline-First: Le tue carte e scansioni funzionano sempre, anche senza rete.\n" +
-                                "• Rete Internet: Usata unicamente per sincronizzare i loghi dei marchi in background.\n" +
-                                "• Zero Tracciamento: Nessuna analisi, profilazione, pubblicità o Firebase.\n" +
-                                "• Dati Privati: Le tue tessere e codici a barre non lasciano mai il tuo dispositivo.\n" +
-                                "• Android Auto Backup: Le tue tessere sono protette anche dai backup di sistema Android.",
+                        text = stringResource(R.string.privacy_points),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -242,7 +240,7 @@ fun SettingsScreen(
                     contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
                 ) {
                     Text(
-                        text = "☕ Buy me a coffee",
+                        text = stringResource(R.string.buy_me_a_coffee),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -255,18 +253,18 @@ fun SettingsScreen(
             val count = viewModel.pendingImportCards!!.size
             AlertDialog(
                 onDismissRequest = { viewModel.showImportDialog = false },
-                title = { Text("Ripristino Tessere ($count trovate)") },
+                title = { Text(stringResource(R.string.restore_dialog_title, count)) },
                 text = {
-                    Text("Come desideri importare le tessere dal file JSON?")
+                    Text(stringResource(R.string.restore_dialog_message))
                 },
                 confirmButton = {
-                    TextButton(onClick = { viewModel.confirmImportMerge() }) {
-                        Text("Aggiungi a esistenti")
+                    TextButton(onClick = { viewModel.confirmImportMerge(context) }) {
+                        Text(stringResource(R.string.restore_merge))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.confirmImportReplace(context) }) {
-                        Text("Sostituisci tutto", color = MaterialTheme.colorScheme.error)
+                        Text(stringResource(R.string.restore_replace), color = MaterialTheme.colorScheme.error)
                     }
                 }
             )

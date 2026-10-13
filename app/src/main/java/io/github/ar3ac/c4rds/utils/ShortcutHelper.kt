@@ -25,7 +25,7 @@ object ShortcutHelper {
             canvas.drawRect(0f, 0f, size.toFloat(), size.toFloat(), paint)
             
             val drawable = if (brandInfo.iconResId != null) {
-                androidx.core.content.ContextCompat.getDrawable(context, brandInfo.iconResId!!)
+                androidx.core.content.ContextCompat.getDrawable(context, brandInfo.iconResId)
             } else if (brandInfo.localFilePath != null) {
                 val file = java.io.File(brandInfo.localFilePath)
                 if (file.exists()) {
@@ -85,7 +85,7 @@ object ShortcutHelper {
 
     fun createCardShortcut(context: Context, card: CardEntity) {
         if (!ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
-            Toast.makeText(context, "Scorciatoie non supportate sul tuo launcher", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.shortcut_not_supported), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -108,7 +108,7 @@ object ShortcutHelper {
 
         val success = ShortcutManagerCompat.requestPinShortcut(context, shortcutInfo, null)
         if (success) {
-            Toast.makeText(context, "Scorciatoia di \"${card.name}\" creata sulla Home", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.shortcut_added), Toast.LENGTH_SHORT).show()
         }
     }
 
