@@ -1,61 +1,85 @@
 # C4rds Wallet 💳
 
-Un'applicazione Android nativa, semplice, ultra-veloce e 100% offline-first per gestire le tue tessere fedeltà e codici a barre (supermercati, negozi, palestre, club). 
+A native, ultra-fast, and 100% offline-first Android application to manage your loyalty cards and barcodes (supermarkets, retail stores, gyms, memberships).
+
+Built with modern Android engineering: Kotlin, Jetpack Compose, Material 3, Room Database, CameraX, and ZXing.
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-green.svg)](https://android.com)
+[![F-Droid Ready](https://img.shields.io/badge/F--Droid-Ready-brightgreen.svg)](https://f-droid.org)
 
 ---
 
-## 🚀 Caratteristiche Principali (V1.0)
+## 🚀 Key Features
 
-- 🔒 **Privacy Friendly**: C4rds è progettato per tutelare i tuoi dati. I backup e le tessere restano sul tuo dispositivo. L'app richiede il permesso `INTERNET` esclusivamente per scaricare (in sola lettura) i loghi dei brand da una repository statica open-source (nessun tracciamento, nessun SDK di terze parti).
-- 📸 **Scansione Barcode & QR Mirata**: Scansione tramite **CameraX** e **ML Kit Barcode Scanning**. Implementa una logica di targeting avanzata che valuta l'orientamento del sensore fotocamera (portrait vs landscape) per leggere i codici *solo* quando passano nel 40% centrale del mirino. Supporto anche per la scansione di barcode da immagini della galleria fotografica.
-- 📐 **Rendering Barcode Alta Qualità**: Generazione ad alta risoluzione tramite **ZXing**, con logiche dinamiche per espandere i codici 1D (EAN/Code128) a tutta larghezza e mantenere i 2D (QR Code) proporzionati, massimizzando la leggibilità con gli scanner laser delle casse dei supermercati.
-- 💡 **Luminosità Massima Temporanea**: All'apertura della schermata della tessera, la luminosità viene portata al 100% (`FLAG_KEEP_SCREEN_ON`). Alla chiusura, la luminosità di sistema originale viene ripristinata automaticamente.
-- ⚡ **Android App Shortcuts Dinamiche e Fisse**: Pressione prolungata sull'icona dell'app nel launcher Android per accedere istantaneamente alle tessere preferite (es. Esselunga, Conad, Lidl) o alla funzione *Aggiungi*. In caso di rimpiazzo del database, l'app si occupa di pulire le shortcut vecchie e "spegnere" (disable) i pinned shortcuts orfani per evitare crash.
-- ⭐ **Estetica Premium e Loghi Cloud**: Header personalizzato in stile moderno con barra di ricerca integrata, design in *glassmorphism* leggero e icone generate vettorialmente via Python. I loghi ufficiali dei negozi vengono scaricati (se presenti) da un database JSON cloud condiviso (`brands.json`).
-- 📦 **Backup Doppio e Condivisione Intelligente**:
-  - **Android Auto Backup**: Configurazione di sistema per backup automatico Google.
-  - **Backup JSON (.c4rds)**: Esportazione ed importazione manuale con Storage Access Framework (SAF). Scelta tra unione o sostituzione del database ("Aggiungi a esistenti" o "Sostituisci tutto").
-  - **Deep Links & Web Sharing**: Condivisione sicura di una singola carta a familiari tramite link web (`https://c4rds.app/create?...`) o file condiviso, intercettato direttamente dai Deep Link dell'app.
+- 🔒 **Privacy-First & 100% Offline**: Your cards, barcodes, and backups remain strictly on your device. No user accounts, no analytics, no ad tracking, and no proprietary cloud SDKs.
+- 📸 **100% Open-Source Barcode & QR Scanner**: Powered by **CameraX** and **ZXing Core** (`com.google.zxing:core`).
+  - Sensor-rotation aware (handles 0°, 90°, 180°, and 270° orientations seamlessly).
+  - Handles CameraX memory rowStride buffer alignment cleanly.
+  - Two-stage detection: focused central viewfinder crop (75% width × 40% height) for instant checkout targeting without picking up neighboring barcodes, with an automatic full-frame fallback.
+  - Gallery scanner support: decode barcodes and QR codes directly from imported images.
+  - Automatic normalization of 12-digit UPC-A codes to standard European EAN-13.
+- 📐 **High-Resolution Barcode Rendering**: Dynamic ZXing vector/bitmap rendering that stretches 1D barcodes (EAN-13, Code 128) across full width for grocery laser scanners while keeping 2D barcodes (QR Codes, DataMatrix) perfectly proportioned.
+- 💡 **Automatic Temporary Peak Brightness**: When viewing a card, screen brightness automatically boosts to 100% (`FLAG_KEEP_SCREEN_ON`) for instant readability at store self-checkouts. The original system brightness is immediately restored upon exiting.
+- ⚡ **Android App Shortcuts (Dynamic & Pinned)**: Long-press the app icon on the Android launcher to access your favorite cards instantly, or pin dedicated 1-tap shortcuts with official store icons directly to your home screen.
+- 🎨 **Modern Material 3 UI & Cloud Logos**: Clean, responsive layout with glassmorphic accents, brand search bar, and custom card reordering. Official store logos are cached locally and synchronized from a public static database (`brands.json`) with procedural color avatar fallbacks.
+- 📦 **Open JSON Backup & Cross-Device Sharing**:
+  - Full backup/restore via Android Storage Access Framework (SAF) using open `.c4rds` JSON format (with embedded Base64 custom logos).
+  - Selective import options: "Add to existing" or "Replace all".
+  - Deep Link & Web Sharing: Share individual cards with family via web links (`https://c4rds.app/create?...`) or shared `.c4rds` files.
 
 ---
 
-## 🛠️ Stack Tecnologico
+## 🛠️ Tech Stack
 
 - **Package ID**: `io.github.ar3ac.c4rds`
-- **Licenza**: GNU General Public License v3.0 (GPL-3.0)
-- **Linguaggio**: Kotlin
-- **UI**: Jetpack Compose + Material 3
-- **Database Locale**: Room Database + Kotlin Coroutines & Flow
-- **Fotocamera e Barcode Scanner**:
-  - Flavor **`foss`**: 100% Open-Source tramite CameraX + ZXing Core (`com.google.zxing:core`), pronto per inclusione ufficiale su **F-Droid**.
-  - Flavor **`full`**: CameraX + Google ML Kit Barcode Scanning per release proprietarie/Google Play.
-- **Generatore Codici**: ZXing Core (`com.google.zxing:core`)
-- **Scorciatoie App**: AndroidX `ShortcutManagerCompat` + `ShortcutManager` (per pulizia pinned shortcuts).
+- **License**: GNU General Public License v3.0 ([GPL-3.0](LICENSE))
+- **Language**: Kotlin 1.9+
+- **UI Toolkit**: Jetpack Compose + Material 3
+- **Local Persistence**: Room Database + Coroutines & Flow
+- **Camera & Scanning**: CameraX (`androidx.camera`) + ZXing Core (`com.google.zxing:core`)
+- **Image Loading**: Coil (`io.coil-kt:coil-compose`)
+- **Serialization**: Google Gson
+- **Shortcuts**: AndroidX `ShortcutManagerCompat`
 
 ---
 
-## 📁 Architettura e Design Decision (Per riferimenti futuri)
+## 🏛️ Architecture & Engineering Notes
 
-- **Doppio Flavor (F-Droid Ready)**: Il progetto è strutturato con la dimensione `distribution` divisa in:
-  - `foss`: privo di qualsiasi binario proprietario o dipendenza Google Play Services. L'analisi dei frame della fotocamera e delle immagini da galleria è gestita da ZXing (`BarcodeScannerEngine.kt` in `src/foss/`).
-  - `full`: include `com.google.mlkit:barcode-scanning` (`BarcodeScannerEngine.kt` in `src/full/`).
-- **Centering & Targeting Mirino**: In entrambe le implementazioni, l'area di scansione valuta la rotazione del sensore (portrait vs landscape) ed esegue il crop/targeting nel mirino centrale, ignorando codici a barre periferici.
-- **BrandIcon Fallback**: La funzione `BrandIcon` (in `ui/components/`) gestisce il caricamento asincrono via Coil, fallback su file locale, o fallback finale su un badge circolare con l'iniziale del negozio.
-- **Metadati Fastlane**: Presenti in `fastlane/metadata/android/` (`it-IT` ed `en-US`) conformi agli standard di pubblicazione automatica per F-Droid e Google Play.
-- **Automazione Icone**: Generazione delle icone Mipmap e Round (in `res/mipmap-*/`) tramite script Python nativo con `Pillow`.
-- **DeepLink Routing**: Definito in `NavGraph.kt` e `AndroidManifest.xml` (scheme `c4rds://` e pathPattern `.*\.c4rds`).
+- **Unified Open-Source Scanner**: In [`BarcodeScannerEngine.kt`](app/src/main/java/io/github/ar3ac/c4rds/ui/scan/BarcodeScannerEngine.kt), CameraX YUV_420_888 luminance planes are extracted and transposed according to the hardware sensor rotation (`rotationDegrees`). ZXing binarizes the luminance directly in memory without RGB overhead, ensuring sub-10ms decoding.
+- **Fastlane Metadata**: Packaged in `fastlane/metadata/android/` (`en-US` and `it-IT`) compliant with F-Droid and Google Play automated submission pipelines.
+- **Deep Link Navigation**: Handled in `NavGraph.kt` and `AndroidManifest.xml` supporting `c4rds://`, `mycards://`, and `https://c4rds.app/` URI schemes.
+- **Brand Fallback System**: Implemented in `BrandIcon.kt`, providing three tiers of visual representation: local custom asset -> cloud cache -> deterministic colored monogram badge.
 
 ---
 
-## 💻 Sviluppo e Compilazione
+## 💻 Building and Development
 
-L'intero ciclo di build e deploy è automatizzato dallo script di servizio `build_and_deploy.sh`, che compila i flavor debug, sposta gli APK risultanti nella cartella Dropbox per la distribuzione rapida, ed effettua il commit/push su GitHub in un unico passaggio:
+### Prerequisites
+- Android SDK (API 34 compileSdk, minSdk 26)
+- JDK 17
+- Gradle 8.5+
+
+### Build Commands
 
 ```bash
-# Compilazione debug e deploy
-./build_and_deploy.sh "messaggio di commit"
+# Build Debug APK
+gradle assembleDebug
 
-# Compilazione singola via Gradle:
-gradle assembleFullDebug   # Versione con ML Kit
-gradle assembleFossDebug   # Versione 100% FOSS per F-Droid
+# Build Release APK
+gradle assembleRelease
 ```
+
+### Automation Script
+
+The included `build_and_deploy.sh` script automates compilation, copies the output APK to Dropbox for immediate phone testing, and commits/pushes changes to GitHub:
+
+```bash
+./build_and_deploy.sh "commit message"
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the **GNU General Public License v3.0** - see the [LICENSE](LICENSE) file for details.

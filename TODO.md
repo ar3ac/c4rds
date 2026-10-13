@@ -20,7 +20,7 @@
 ---
 
 - [x] Step 15: Preparazione F-Droid: Licenza GNU GPLv3, ridenominazione package a `io.github.ar3ac.c4rds`.
-- [x] Step 16: Architettura Dual-Flavor (`foss` con scansione ZXing 100% open-source, `full` con Google ML Kit).
+- [x] Step 16: Migrazione completa e unificata a ZXing (100% open-source, rimozione totale di Google ML Kit).
 - [x] Step 17: Struttura metadati Fastlane (`it-IT`, `en-US`) per pubblicazione F-Droid.
 - [x] Step 18: Scansione barcode da Immagine / Galleria.
 

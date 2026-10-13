@@ -21,16 +21,6 @@ android {
         }
     }
 
-    flavorDimensions += "distribution"
-    productFlavors {
-        create("foss") {
-            dimension = "distribution"
-        }
-        create("full") {
-            dimension = "distribution"
-        }
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -89,10 +79,7 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
     implementation("androidx.camera:camera-view:$cameraxVersion")
 
-    // ML Kit Barcode Scanning (Bundled model - 100% offline, only for full flavor)
-    "fullImplementation"("com.google.mlkit:barcode-scanning:17.3.0")
-
-    // ZXing Barcode Generator
+    // Barcode Scanning & Generation (100% Offline & Open-Source)
     implementation("com.google.zxing:core:3.5.3")
 
     // Compose Reorderable (Drag and Drop)

@@ -40,24 +40,33 @@ class BarcodeScannerEngine {
         }
 
         try {
-            val plane = imageProxy.planes[0]
-            val buffer = plane.buffer
-            val data = ByteArray(buffer.remaining())
-            buffer.get(data)
-
+            val yPlane = imageProxy.planes[0]
+            val yBuffer = yPlane.buffer
+            val rowStride = yPlane.rowStride
             val width = imageProxy.width
             val height = imageProxy.height
             val rotation = imageProxy.imageInfo.rotationDegrees
 
+            // Estrae i byte Y considerando l'eventuale padding del rowStride
+            val data = ByteArray(width * height)
+            if (rowStride == width) {
+                yBuffer.get(data)
+            } else {
+                for (row in 0 until height) {
+                    yBuffer.position(row * rowStride)
+                    yBuffer.get(data, row * width, width)
+                }
+            }
+
             val (rotatedData, finalWidth, finalHeight) = rotateYuv(data, width, height, rotation)
 
-            // Crop al mirino centrale (circa 70% larghezza x 40% altezza)
-            val cropWidth = (finalWidth * 0.70f).toInt().coerceIn(1, finalWidth)
+            // 1. Prova prima con il crop mirato centrale (75% larghezza x 40% altezza)
+            val cropWidth = (finalWidth * 0.75f).toInt().coerceIn(1, finalWidth)
             val cropHeight = (finalHeight * 0.40f).toInt().coerceIn(1, finalHeight)
             val cropLeft = ((finalWidth - cropWidth) / 2).coerceIn(0, finalWidth - cropWidth)
             val cropTop = ((finalHeight - cropHeight) / 2).coerceIn(0, finalHeight - cropHeight)
 
-            val source = PlanarYUVLuminanceSource(
+            val croppedSource = PlanarYUVLuminanceSource(
                 rotatedData,
                 finalWidth,
                 finalHeight,
@@ -68,24 +77,45 @@ class BarcodeScannerEngine {
                 false
             )
 
-            val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
-            val result = reader.decodeWithState(binaryBitmap)
-
-            var rawValue = result.text ?: ""
-            var formatStr = mapFormatToString(result.barcodeFormat)
-
-            if (result.barcodeFormat == BarcodeFormat.UPC_A && rawValue.length == 12) {
-                rawValue = "0$rawValue"
-                formatStr = "EAN_13"
+            var result: Result? = null
+            try {
+                result = reader.decodeWithState(BinaryBitmap(HybridBinarizer(croppedSource)))
+            } catch (_: NotFoundException) {
+                // Se non trovato nel box centrale ristretto, fallback sull'intero frame ruotato
+                try {
+                    reader.reset()
+                    val fullSource = PlanarYUVLuminanceSource(
+                        rotatedData,
+                        finalWidth,
+                        finalHeight,
+                        0,
+                        0,
+                        finalWidth,
+                        finalHeight,
+                        false
+                    )
+                    result = reader.decodeWithState(BinaryBitmap(HybridBinarizer(fullSource)))
+                } catch (_: NotFoundException) {
+                    // Nessun barcode rilevato in questo frame
+                }
             }
 
-            if (rawValue.isNotBlank()) {
-                onSuccess(rawValue, formatStr)
+            if (result != null) {
+                var rawValue = result.text ?: ""
+                var formatStr = mapFormatToString(result.barcodeFormat)
+
+                // Fix UPC-A -> EAN-13
+                if (result.barcodeFormat == BarcodeFormat.UPC_A && rawValue.length == 12) {
+                    rawValue = "0$rawValue"
+                    formatStr = "EAN_13"
+                }
+
+                if (rawValue.isNotBlank()) {
+                    onSuccess(rawValue, formatStr)
+                }
             }
-        } catch (_: NotFoundException) {
-            // Nessun codice rilevato in questo frame, continua
         } catch (e: Exception) {
-            // Ignora errori di parsing temporanei sui singoli frame
+            // Ignora eccezioni temporanee di parsing frame
         } finally {
             reader.reset()
             onComplete()
