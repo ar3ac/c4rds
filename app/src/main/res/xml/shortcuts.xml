@@ -8,8 +8,8 @@
         android:shortcutLongLabel="@string/shortcut_add_card_long">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.example.mycards"
-            android:targetClass="com.example.mycards.MainActivity"
+            android:targetPackage="io.github.ar3ac.c4rds"
+            android:targetClass="io.github.ar3ac.c4rds.MainActivity"
             android:data="mycards://add" />
     </shortcut>
 </shortcuts>

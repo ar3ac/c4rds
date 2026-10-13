@@ -1,0 +1,1 @@
+Fast, offline-first and privacy-friendly loyalty card and barcode wallet.

@@ -19,9 +19,18 @@
 
 ---
 
+- [x] Step 15: Preparazione F-Droid: Licenza GNU GPLv3, ridenominazione package a `io.github.ar3ac.c4rds`.
+- [x] Step 16: Architettura Dual-Flavor (`foss` con scansione ZXing 100% open-source, `full` con Google ML Kit).
+- [x] Step 17: Struttura metadati Fastlane (`it-IT`, `en-US`) per pubblicazione F-Droid.
+- [x] Step 18: Scansione barcode da Immagine / Galleria.
+
+---
+
 ## 💡 Idee per V2 (Roadmap Futura)
 
 - [ ] **Drag & Drop Manuale (UI)**:
   - Il database è già pronto (campo `displayOrder`), manca solo l'implementazione visiva dei gesture detector sulla `LazyColumn` per spostare le tessere a piacimento.
-- [ ] **Importazione da Immagine / Galleria**:
-  - Scansione e rilevamento barcode da foto salvate nella galleria.
+- [ ] **Wear OS Companion**:
+  - Visualizzazione delle tessere fedeltà direttamente dallo smartwatch al polso.
+- [ ] **Widget Android / Quick Settings Tile**:
+  - Scorciatoia rapida alle carte preferite direttamente dal pannello notifiche o widget home.

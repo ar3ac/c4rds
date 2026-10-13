@@ -1,0 +1,10 @@
+Un'applicazione Android nativa, semplice, ultra-veloce e 100% offline-first per gestire le tue tessere fedeltà e codici a barre (supermercati, negozi, palestre, club).
+
+Caratteristiche:
+• Privacy-friendly: nessun account richiesto, nessun tracciamento, nessun dato inviato a server esterni.
+• Scansione barcode e codici QR rapida e mirata.
+• Luminosità automatica al 100% all'apertura del dettaglio tessera per facilitare la lettura alle casse.
+• Scorciatoie Android (App Shortcuts) e Pin sulla schermata Home per accedere istantaneamente alle tue tessere preferite.
+• Backup e ripristino in formato JSON aperto (.c4rds).
+• Condivisione semplice delle tessere tramite link o file.
+• Ordinamento personalizzato e interfaccia moderna in Material 3.

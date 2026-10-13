@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mycards"
+    namespace = "io.github.ar3ac.c4rds"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.mycards"
+        applicationId = "io.github.ar3ac.c4rds"
         minSdk = 26
         targetSdk = 34
         versionCode = 6
@@ -18,6 +18,16 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("foss") {
+            dimension = "distribution"
+        }
+        create("full") {
+            dimension = "distribution"
         }
     }
 
@@ -79,8 +89,8 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
     implementation("androidx.camera:camera-view:$cameraxVersion")
 
-    // ML Kit Barcode Scanning (Bundled model - 100% offline)
-    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+    // ML Kit Barcode Scanning (Bundled model - 100% offline, only for full flavor)
+    "fullImplementation"("com.google.mlkit:barcode-scanning:17.3.0")
 
     // ZXing Barcode Generator
     implementation("com.google.zxing:core:3.5.3")

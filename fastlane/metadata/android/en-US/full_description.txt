@@ -1,0 +1,10 @@
+A native, simple, lightning-fast and 100% offline-first Android application to manage your loyalty cards and barcodes (supermarkets, shops, gyms, clubs).
+
+Features:
+• Privacy-friendly: No account required, zero tracking, no data sent to external servers.
+• Fast, targeted barcode and QR code scanner.
+• Automatic 100% screen brightness on card detail view for effortless checkout scanning.
+• Android App Shortcuts & Pinned Home shortcuts to open favorite cards instantly.
+• Open JSON backup & restore (.c4rds).
+• Easy card sharing via link or file.
+• Custom reordering and clean Material 3 UI.

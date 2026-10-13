@@ -21,10 +21,14 @@ Un'applicazione Android nativa, semplice, ultra-veloce e 100% offline-first per 
 
 ## 🛠️ Stack Tecnologico
 
+- **Package ID**: `io.github.ar3ac.c4rds`
+- **Licenza**: GNU General Public License v3.0 (GPL-3.0)
 - **Linguaggio**: Kotlin
 - **UI**: Jetpack Compose + Material 3
 - **Database Locale**: Room Database + Kotlin Coroutines & Flow
-- **Fotocamera e ML**: CameraX (`androidx.camera`) + Google ML Kit Barcode Scanning
+- **Fotocamera e Barcode Scanner**:
+  - Flavor **`foss`**: 100% Open-Source tramite CameraX + ZXing Core (`com.google.zxing:core`), pronto per inclusione ufficiale su **F-Droid**.
+  - Flavor **`full`**: CameraX + Google ML Kit Barcode Scanning per release proprietarie/Google Play.
 - **Generatore Codici**: ZXing Core (`com.google.zxing:core`)
 - **Scorciatoie App**: AndroidX `ShortcutManagerCompat` + `ShortcutManager` (per pulizia pinned shortcuts).
 
@@ -32,17 +36,26 @@ Un'applicazione Android nativa, semplice, ultra-veloce e 100% offline-first per 
 
 ## 📁 Architettura e Design Decision (Per riferimenti futuri)
 
-- **MLKit Centering Logic**: In `BarcodeScannerScreen.kt`, il bounding box del barcode restituito da MLKit viene validato incrociandolo con `rotationDegrees` (90 o 270) per scambiare larghezza e altezza del buffer originale. Questo risolve il problema della fotocamera mobile in cui il sensore lavora in 1280x720 mentre lo schermo è 720x1280.
-- **BrandIcon Fallback**: La funzione `BrandIcon` (in `ui/components/`) gestisce il caricamento asincrono via Glide/Coil, fallback su file locale, o fallback finale su un badge circolare con l'iniziale del negozio colorata pseudo-casualmente in base all'hash del nome.
-- **Automazione Icone**: Generazione delle icone Mipmap e Round (in `res/mipmap-*/`) tramite script Python nativo con `Pillow` per massimizzare la nitidezza del logo vettoriale in stile LinkedIn.
+- **Doppio Flavor (F-Droid Ready)**: Il progetto è strutturato con la dimensione `distribution` divisa in:
+  - `foss`: privo di qualsiasi binario proprietario o dipendenza Google Play Services. L'analisi dei frame della fotocamera e delle immagini da galleria è gestita da ZXing (`BarcodeScannerEngine.kt` in `src/foss/`).
+  - `full`: include `com.google.mlkit:barcode-scanning` (`BarcodeScannerEngine.kt` in `src/full/`).
+- **Centering & Targeting Mirino**: In entrambe le implementazioni, l'area di scansione valuta la rotazione del sensore (portrait vs landscape) ed esegue il crop/targeting nel mirino centrale, ignorando codici a barre periferici.
+- **BrandIcon Fallback**: La funzione `BrandIcon` (in `ui/components/`) gestisce il caricamento asincrono via Coil, fallback su file locale, o fallback finale su un badge circolare con l'iniziale del negozio.
+- **Metadati Fastlane**: Presenti in `fastlane/metadata/android/` (`it-IT` ed `en-US`) conformi agli standard di pubblicazione automatica per F-Droid e Google Play.
+- **Automazione Icone**: Generazione delle icone Mipmap e Round (in `res/mipmap-*/`) tramite script Python nativo con `Pillow`.
 - **DeepLink Routing**: Definito in `NavGraph.kt` e `AndroidManifest.xml` (scheme `c4rds://` e pathPattern `.*\.c4rds`).
 
 ---
 
 ## 💻 Sviluppo e Compilazione
 
-L'intero ciclo di build e deploy è automatizzato dallo script di servizio `build_and_deploy.sh`, che esegue `gradlew assembleDebug`, sposta l'APK risultante nella cartella Dropbox per la distribuzione rapida, ed effettua il commit/push su GitHub in un unico passaggio.
+L'intero ciclo di build e deploy è automatizzato dallo script di servizio `build_and_deploy.sh`, che compila i flavor debug, sposta gli APK risultanti nella cartella Dropbox per la distribuzione rapida, ed effettua il commit/push su GitHub in un unico passaggio:
 
 ```bash
+# Compilazione debug e deploy
 ./build_and_deploy.sh "messaggio di commit"
+
+# Compilazione singola via Gradle:
+gradle assembleFullDebug   # Versione con ML Kit
+gradle assembleFossDebug   # Versione 100% FOSS per F-Droid
 ```
