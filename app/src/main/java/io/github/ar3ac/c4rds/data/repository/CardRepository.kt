@@ -31,38 +31,26 @@ class CardRepository(
     }
 
     suspend fun insertCard(card: CardEntity): Long {
-        val id = cardDao.insertCard(card)
-        syncShortcuts()
-        return id
+        return cardDao.insertCard(card)
     }
 
     suspend fun updateCard(card: CardEntity) {
         cardDao.updateCard(card)
-        syncShortcuts()
     }
 
     suspend fun updateCardsOrder(cards: List<CardEntity>) {
         cardDao.updateCards(cards)
-        syncShortcuts()
     }
 
     suspend fun deleteCard(card: CardEntity) {
         cardDao.deleteCard(card)
-        syncShortcuts()
     }
 
     suspend fun deleteAllCards() {
         cardDao.deleteAllCards()
-        syncShortcuts()
     }
 
     suspend fun insertAll(cards: List<CardEntity>) {
         cardDao.insertAll(cards)
-        syncShortcuts()
-    }
-
-    private suspend fun syncShortcuts() {
-        val topCards = cardDao.getTopCards(10)
-        ShortcutHelper.updateDynamicShortcuts(context, topCards)
     }
 }

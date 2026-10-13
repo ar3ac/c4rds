@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import java.io.File
+import java.net.HttpURLConnection
 import java.net.URL
 
 object CloudBrandManager {
@@ -25,7 +26,15 @@ object CloudBrandManager {
     suspend fun sync(context: Context) {
         withContext(Dispatchers.IO) {
             try {
-                val jsonString = URL(CLOUD_BRANDS_URL).readText()
+                val connection = URL(CLOUD_BRANDS_URL).openConnection() as HttpURLConnection
+                connection.connectTimeout = 4000
+                connection.readTimeout = 4000
+                if (connection.responseCode != 200) {
+                    Log.d("CloudBrandManager", "Sync saltato (HTTP ${connection.responseCode})")
+                    return@withContext
+                }
+
+                val jsonString = connection.inputStream.bufferedReader().use { it.readText() }
                 val jsonArray = JSONArray(jsonString)
                 val newBrands = mutableListOf<CloudBrand>()
 
@@ -45,14 +54,15 @@ object CloudBrandManager {
                         keywords.add(keywordsArray.getString(j).lowercase())
                     }
 
-                    // Nome file basato sull'hash dell'URL
                     val filename = iconUrl.hashCode().toString() + ".png"
                     val file = File(logosDir, filename)
 
-                    // Se non esiste, lo scarica
                     if (!file.exists()) {
                         try {
-                            val bytes = URL(iconUrl).readBytes()
+                            val imgConn = URL(iconUrl).openConnection() as HttpURLConnection
+                            imgConn.connectTimeout = 5000
+                            imgConn.readTimeout = 5000
+                            val bytes = imgConn.inputStream.use { it.readBytes() }
                             file.writeBytes(bytes)
                         } catch (e: Exception) {
                             Log.e("CloudBrandManager", "Errore download logo $name: ${e.message}")
@@ -67,7 +77,7 @@ object CloudBrandManager {
                 cloudBrands = newBrands
                 Log.d("CloudBrandManager", "Sincronizzati ${newBrands.size} brand dal cloud.")
             } catch (e: Exception) {
-                Log.e("CloudBrandManager", "Errore sync brand dal cloud: ${e.message}")
+                Log.d("CloudBrandManager", "Nessun brand cloud aggiornato (${e.message})")
             }
         }
     }

@@ -122,7 +122,10 @@ class AddEditViewModel(
                 // 2. Clearbit Autocomplete -> Google Favicon (Fallback)
                 try {
                     val url = "https://autocomplete.clearbit.com/v1/companies/suggest?query=${query.trim().replace(" ", "")}"
-                    val jsonString = URL(url).readText()
+                    val connection = URL(url).openConnection() as java.net.HttpURLConnection
+                    connection.connectTimeout = 5000
+                    connection.readTimeout = 5000
+                    val jsonString = connection.inputStream.bufferedReader().use { it.readText() }
                     val jsonArray = JSONArray(jsonString)
                     
                     for (i in 0 until jsonArray.length()) {
