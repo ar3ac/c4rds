@@ -11,6 +11,16 @@ Built with modern Android engineering: Kotlin, Jetpack Compose, Material 3, Room
 
 ---
 
+## 📱 Screenshots
+
+<p align="center">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1_home.png" width="30%" alt="Home Screen" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2_detail.png" width="30%" alt="Card Detail Screen" />
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3_settings.png" width="30%" alt="Settings & Ko-fi" />
+</p>
+
+---
+
 ## 🚀 Key Features
 
 - 🔒 **Privacy-First & 100% Offline**: Your cards, barcodes, and backups remain strictly on your device. No user accounts, no analytics, no ad tracking, and no proprietary cloud SDKs.
