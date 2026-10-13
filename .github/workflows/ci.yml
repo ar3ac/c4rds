@@ -36,3 +36,4 @@ jobs:
         with:
           name: c4rds-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+
