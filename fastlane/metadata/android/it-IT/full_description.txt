@@ -8,3 +8,5 @@ Caratteristiche:
 • Backup e ripristino in formato JSON aperto (.c4rds).
 • Condivisione semplice delle tessere tramite link o file.
 • Ordinamento personalizzato e interfaccia moderna in Material 3.
+
+Disclaimer: Tutti i marchi e i loghi appartengono ai rispettivi proprietari. Il loro utilizzo è puramente descrittivo per facilitare l'identificazione personale delle tessere. C4rds non è affiliata con alcuno dei marchi mostrati.

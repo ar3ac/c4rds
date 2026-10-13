@@ -104,4 +104,8 @@
     <!-- Shortcuts -->
     <string name="shortcut_not_supported">Shortcuts not supported on your launcher</string>
     <string name="shortcut_added">Shortcut added to Home Screen!</string>
+
+    <!-- Legal Disclaimer -->
+    <string name="legal_disclaimer_title">Legal Disclaimer</string>
+    <string name="legal_disclaimer_text">All brand names, logos, and trademarks displayed in C4rds are the property of their respective owners. Their inclusion is purely nominative and descriptive, intended solely to help users identify their personal loyalty cards. C4rds is an independent open-source project and is not affiliated with, sponsored, or endorsed by any brand.</string>
 </resources>

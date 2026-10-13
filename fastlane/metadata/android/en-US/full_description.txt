@@ -8,3 +8,5 @@ Features:
 • Open JSON backup & restore (.c4rds).
 • Easy card sharing via link or file.
 • Custom reordering and clean Material 3 UI.
+
+Disclaimer: All trademarks and brand logos belong to their respective owners. Their use is purely nominative to help users identify their cards. C4rds is not affiliated with any of the brands displayed.

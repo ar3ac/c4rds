@@ -28,6 +28,7 @@
 - [x] Step 21: Unit tests (JUnit 4) per serializzazione/backward compatibility backup JSON e mappatura formati barcode ZXing.
 - [x] Step 22: GitHub Actions CI & Continuous Delivery: build automatico, test e pubblicazione GitHub Releases con APK allegato su tag `v*`.
 - [x] Step 23: Ricetta metadati ufficiale F-Droid inclusa nel repository (`fdroid/io.github.ar3ac.c4rds.yml`).
+- [x] Step 24: Tutela legale e marchi: inserito Trademark & Legal Disclaimer nominativo in README.md, Fastlane (EN/IT) e nelle Impostazioni dell'app con clausola di rimozione su richiesta.
 
 ---
 

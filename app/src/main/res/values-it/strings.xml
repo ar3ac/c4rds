@@ -104,4 +104,8 @@
     <!-- Shortcuts -->
     <string name="shortcut_not_supported">Scorciatoie non supportate sul tuo launcher</string>
     <string name="shortcut_added">Scorciatoia aggiunta alla Home!</string>
+
+    <!-- Legal Disclaimer -->
+    <string name="legal_disclaimer_title">Note legali e marchi</string>
+    <string name="legal_disclaimer_text">Tutti i marchi, loghi e nomi commerciali visualizzati in C4rds appartengono ai rispettivi proprietari. Il loro utilizzo è puramente descrittivo e identificativo per facilitare il riconoscimento delle tessere personali dell\'utente. C4rds è un progetto open-source indipendente e non è affiliato, sponsorizzato o approvato da alcuno dei marchi visualizzati.</string>
 </resources>

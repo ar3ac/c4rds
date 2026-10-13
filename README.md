@@ -99,6 +99,14 @@ If you find C4rds helpful, consider supporting its development:
 
 <a href="https://ko-fi.com/ar3ac" target="_blank"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support on Ko-fi" style="height: 40px !important;"></a>
 
+## ⚖️ Trademarks & Legal Disclaimer
+
+All brand names, logos, and trademarks displayed in this application and repository are the property of their respective owners. Their inclusion is purely nominative and descriptive, intended solely to help individual users identify their personal loyalty cards.
+
+C4rds is an independent, non-commercial, open-source project and is not affiliated with, authorized, sponsored, or endorsed by any of the respective brand owners.
+
+If you are a trademark owner and wish to request the removal of a brand icon from the default preset database, please contact [luca.marrazzo@gmail.com](mailto:luca.marrazzo@gmail.com) and it will be removed promptly.
+
 ---
 
 ## 📄 License
