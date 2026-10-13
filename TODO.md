@@ -25,6 +25,9 @@
 - [x] Step 18: Scansione barcode da Immagine / Galleria.
 - [x] Step 19: Supporto donazioni / "Buy me a coffee" via Ko-fi integrato nelle Impostazioni e nel README.
 - [x] Step 20: Internazionalizzazione completa (i18n): catalogo stringhe multilingua con Inglese come default (per F-Droid e utenti globali) e Italiano completo (`values-it`).
+- [x] Step 21: Unit tests (JUnit 4) per serializzazione/backward compatibility backup JSON e mappatura formati barcode ZXing.
+- [x] Step 22: GitHub Actions CI & Continuous Delivery: build automatico, test e pubblicazione GitHub Releases con APK allegato su tag `v*`.
+- [x] Step 23: Ricetta metadati ufficiale F-Droid inclusa nel repository (`fdroid/io.github.ar3ac.c4rds.yml`).
 
 ---
 

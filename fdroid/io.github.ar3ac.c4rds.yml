@@ -1,0 +1,41 @@
+Categories:
+  - Money
+  - Utilities
+License: GPL-3.0-or-later
+AuthorName: ar3ac
+AuthorWebSite: https://github.com/ar3ac
+SourceCode: https://github.com/ar3ac/c4rds
+IssueTracker: https://github.com/ar3ac/c4rds/issues
+Donate: https://ko-fi.com/ar3ac
+
+AutoName: C4rds
+Summary: Offline loyalty card & barcode wallet
+Description: |-
+  A native, ultra-fast, and 100% offline-first Android application to manage your
+  loyalty cards and barcodes (supermarkets, retail stores, gyms, memberships).
+
+  Features:
+  * 100% Open-Source ZXing & CameraX Barcode/QR Scanner
+  * Scan barcodes from camera or import from gallery photos
+  * Full offline-first design: cards stay strictly on your device
+  * High-resolution barcode and QR code rendering
+  * Automatic temporary peak screen brightness for retail self-checkouts
+  * Pinned launcher shortcuts with store logos
+  * Fast JSON backup and restore (.c4rds)
+  * Native English and Italian internationalization (i18n)
+
+RepoType: git
+Repo: https://github.com/ar3ac/c4rds.git
+
+Builds:
+  - versionName: 1.5.0
+    versionCode: 7
+    commit: v1.5.0
+    subdir: app
+    gradle:
+      - yes
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 1.5.0
+CurrentVersionCode: 7
