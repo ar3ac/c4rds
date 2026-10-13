@@ -44,6 +44,9 @@ android {
         kotlinCompilerExtensionVersion = "1.5.8"
     }
     packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
         resources {
             excludes += "/META-INDEX/*"
         }
