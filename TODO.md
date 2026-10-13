@@ -23,6 +23,7 @@
 - [x] Step 16: Migrazione completa e unificata a ZXing (100% open-source, rimozione totale di Google ML Kit).
 - [x] Step 17: Struttura metadati Fastlane (`it-IT`, `en-US`) per pubblicazione F-Droid.
 - [x] Step 18: Scansione barcode da Immagine / Galleria.
+- [x] Step 19: Supporto donazioni / "Buy me a coffee" via Ko-fi integrato nelle Impostazioni e nel README.
 
 ---
 

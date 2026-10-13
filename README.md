@@ -7,6 +7,7 @@ Built with modern Android engineering: Kotlin, Jetpack Compose, Material 3, Room
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-green.svg)](https://android.com)
 [![F-Droid Ready](https://img.shields.io/badge/F--Droid-Ready-brightgreen.svg)](https://f-droid.org)
+[![Support on Ko-fi](https://img.shields.io/badge/Ko--fi-Support-29abe0?logo=ko-fi&logoColor=white)](https://ko-fi.com/ar3ac)
 
 ---
 
@@ -77,6 +78,14 @@ The included `build_and_deploy.sh` script automates compilation, copies the outp
 ```bash
 ./build_and_deploy.sh "commit message"
 ```
+
+---
+
+## ☕ Support the Project
+
+If you find C4rds helpful, consider supporting its development:
+
+<a href="https://ko-fi.com/ar3ac" target="_blank"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support on Ko-fi" style="height: 40px !important;"></a>
 
 ---
 
