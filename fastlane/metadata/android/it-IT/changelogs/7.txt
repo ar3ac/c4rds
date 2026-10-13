@@ -2,3 +2,4 @@
 - Compatibilità e allineamento pagine 16 KB per Android 15.
 - Scansione barcode e codici QR da immagini in galleria.
 - Aggiunto pulsante di supporto su Ko-fi nelle impostazioni.
+- Internazionalizzazione completa (supporto nativo Inglese e Italiano).

@@ -2,3 +2,4 @@
 - Android 15 16 KB page size alignment and optimizations.
 - Scan barcodes from gallery images.
 - Added Ko-fi support button.
+- Complete internationalization (native English & Italian support).
