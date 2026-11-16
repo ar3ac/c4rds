@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.camera.core.ImageProxy
 import com.google.zxing.*
+import com.google.zxing.common.GlobalHistogramBinarizer
 import com.google.zxing.common.HybridBinarizer
 
 class BarcodeScannerEngine {
@@ -28,6 +29,11 @@ class BarcodeScannerEngine {
         setHints(hints)
     }
 
+    // Preallocated byte buffers reused across frames to prevent GC pressure and frame drops
+    private var yuvBuffer: ByteArray? = null
+    private var rotatedBuffer: ByteArray? = null
+
+    @Synchronized
     fun scanImageProxy(
         imageProxy: ImageProxy,
         isAlreadyDetected: Boolean,
@@ -47,10 +53,16 @@ class BarcodeScannerEngine {
             val height = imageProxy.height
             val rotation = imageProxy.imageInfo.rotationDegrees
 
-            // Estrae i byte Y considerando l'eventuale padding del rowStride
-            val data = ByteArray(width * height)
+            val requiredSize = width * height
+            var data = yuvBuffer
+            if (data == null || data.size != requiredSize) {
+                data = ByteArray(requiredSize)
+                yuvBuffer = data
+            }
+
+            // Copy Y-plane bytes efficiently considering rowStride padding
             if (rowStride == width) {
-                yBuffer.get(data)
+                yBuffer.get(data, 0, requiredSize)
             } else {
                 for (row in 0 until height) {
                     yBuffer.position(row * rowStride)
@@ -58,53 +70,59 @@ class BarcodeScannerEngine {
                 }
             }
 
-            val (rotatedData, finalWidth, finalHeight) = rotateYuv(data, width, height, rotation)
+            var finalData = data
+            var finalWidth = width
+            var finalHeight = height
 
-            // 1. Prova prima con il crop mirato centrale (75% larghezza x 40% altezza)
-            val cropWidth = (finalWidth * 0.75f).toInt().coerceIn(1, finalWidth)
-            val cropHeight = (finalHeight * 0.40f).toInt().coerceIn(1, finalHeight)
-            val cropLeft = ((finalWidth - cropWidth) / 2).coerceIn(0, finalWidth - cropWidth)
-            val cropTop = ((finalHeight - cropHeight) / 2).coerceIn(0, finalHeight - cropHeight)
+            if (rotation != 0) {
+                var rotated = rotatedBuffer
+                if (rotated == null || rotated.size != requiredSize) {
+                    rotated = ByteArray(requiredSize)
+                    rotatedBuffer = rotated
+                }
+                rotateYuv(data, rotated, width, height, rotation)
+                finalData = rotated
+                if (rotation == 90 || rotation == 270) {
+                    finalWidth = height
+                    finalHeight = width
+                }
+            }
 
-            val croppedSource = PlanarYUVLuminanceSource(
-                rotatedData,
+            // Primary source: full-frame display orientation (preserves quiet zones & margins)
+            val primarySource = PlanarYUVLuminanceSource(
+                finalData,
                 finalWidth,
                 finalHeight,
-                cropLeft,
-                cropTop,
-                cropWidth,
-                cropHeight,
+                0,
+                0,
+                finalWidth,
+                finalHeight,
                 false
             )
 
-            var result: Result? = null
-            try {
-                result = reader.decodeWithState(BinaryBitmap(HybridBinarizer(croppedSource)))
-            } catch (_: NotFoundException) {
-                // Se non trovato nel box centrale ristretto, fallback sull'intero frame ruotato
-                try {
-                    reader.reset()
-                    val fullSource = PlanarYUVLuminanceSource(
-                        rotatedData,
-                        finalWidth,
-                        finalHeight,
-                        0,
-                        0,
-                        finalWidth,
-                        finalHeight,
-                        false
-                    )
-                    result = reader.decodeWithState(BinaryBitmap(HybridBinarizer(fullSource)))
-                } catch (_: NotFoundException) {
-                    // Nessun barcode rilevato in questo frame
-                }
+            var result = decodeLuminanceSource(primarySource)
+
+            // Secondary source: if not detected and rotation != 0, test unrotated raw sensor frame.
+            // Raw sensor frame is orthogonal (90° offset), so it instantly detects barcodes oriented vertically!
+            if (result == null && rotation != 0) {
+                val secondarySource = PlanarYUVLuminanceSource(
+                    data,
+                    width,
+                    height,
+                    0,
+                    0,
+                    width,
+                    height,
+                    false
+                )
+                result = decodeLuminanceSource(secondarySource)
             }
 
             if (result != null) {
                 var rawValue = result.text ?: ""
                 var formatStr = mapFormatToString(result.barcodeFormat)
 
-                // Fix UPC-A -> EAN-13
+                // Fix UPC-A -> EAN-13 (leading 0)
                 if (result.barcodeFormat == BarcodeFormat.UPC_A && rawValue.length == 12) {
                     rawValue = "0$rawValue"
                     formatStr = "EAN_13"
@@ -114,14 +132,36 @@ class BarcodeScannerEngine {
                     onSuccess(rawValue, formatStr)
                 }
             }
-        } catch (e: Exception) {
-            // Ignora eccezioni temporanee di parsing frame
+        } catch (_: Exception) {
+            // Ignore transient decoding exceptions per frame
         } finally {
-            reader.reset()
             onComplete()
         }
     }
 
+    internal fun decodeLuminanceSource(source: LuminanceSource): Result? {
+        // 1. GlobalHistogramBinarizer: By far the fastest & most reliable for 1D barcodes under real lighting
+        try {
+            reader.reset()
+            return reader.decodeWithState(BinaryBitmap(GlobalHistogramBinarizer(source)))
+        } catch (_: NotFoundException) {}
+
+        // 2. HybridBinarizer: Optimized for 2D barcodes (QR, DataMatrix, PDF417)
+        try {
+            reader.reset()
+            return reader.decodeWithState(BinaryBitmap(HybridBinarizer(source)))
+        } catch (_: NotFoundException) {}
+
+        // 3. Inverted GlobalHistogramBinarizer: Light-on-dark / inverted barcodes (dark mode cards)
+        try {
+            reader.reset()
+            return reader.decodeWithState(BinaryBitmap(GlobalHistogramBinarizer(source.invert())))
+        } catch (_: NotFoundException) {}
+
+        return null
+    }
+
+    @Synchronized
     fun scanUri(
         context: Context,
         uri: Uri,
@@ -144,18 +184,33 @@ class BarcodeScannerEngine {
             bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
 
             val source = RGBLuminanceSource(width, height, pixels)
-            val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
-            val result = reader.decodeWithState(binaryBitmap)
+            var result = decodeLuminanceSource(source)
 
-            var rawValue = result.text ?: ""
-            var formatStr = mapFormatToString(result.barcodeFormat)
-
-            if (result.barcodeFormat == BarcodeFormat.UPC_A && rawValue.length == 12) {
-                rawValue = "0$rawValue"
-                formatStr = "EAN_13"
+            // If not found in original orientation, try rotated 90 degrees
+            if (result == null) {
+                val rotatedPixels = IntArray(width * height)
+                for (y in 0 until height) {
+                    for (x in 0 until width) {
+                        rotatedPixels[x * height + (height - y - 1)] = pixels[x + y * width]
+                    }
+                }
+                val rotatedSource = RGBLuminanceSource(height, width, rotatedPixels)
+                result = decodeLuminanceSource(rotatedSource)
             }
 
-            onSuccess(rawValue, formatStr)
+            if (result != null) {
+                var rawValue = result.text ?: ""
+                var formatStr = mapFormatToString(result.barcodeFormat)
+
+                if (result.barcodeFormat == BarcodeFormat.UPC_A && rawValue.length == 12) {
+                    rawValue = "0$rawValue"
+                    formatStr = "EAN_13"
+                }
+
+                onSuccess(rawValue, formatStr)
+            } else {
+                onError(context.getString(io.github.ar3ac.c4rds.R.string.scan_no_barcode_found))
+            }
         } catch (_: NotFoundException) {
             onError(context.getString(io.github.ar3ac.c4rds.R.string.scan_no_barcode_found))
         } catch (e: Exception) {
@@ -166,38 +221,36 @@ class BarcodeScannerEngine {
     }
 
     private fun rotateYuv(
-        data: ByteArray,
+        src: ByteArray,
+        dst: ByteArray,
         width: Int,
         height: Int,
         rotation: Int
-    ): Triple<ByteArray, Int, Int> {
-        return when (rotation) {
+    ) {
+        when (rotation) {
             90 -> {
-                val rotated = ByteArray(data.size)
                 for (y in 0 until height) {
                     for (x in 0 until width) {
-                        rotated[x * height + (height - y - 1)] = data[x + y * width]
+                        dst[x * height + (height - y - 1)] = src[x + y * width]
                     }
                 }
-                Triple(rotated, height, width)
             }
             180 -> {
-                val rotated = ByteArray(data.size)
-                for (i in data.indices) {
-                    rotated[data.size - 1 - i] = data[i]
+                val lastIdx = src.size - 1
+                for (i in src.indices) {
+                    dst[lastIdx - i] = src[i]
                 }
-                Triple(rotated, width, height)
             }
             270 -> {
-                val rotated = ByteArray(data.size)
                 for (y in 0 until height) {
                     for (x in 0 until width) {
-                        rotated[(width - x - 1) * height + y] = data[x + y * width]
+                        dst[(width - x - 1) * height + y] = src[x + y * width]
                     }
                 }
-                Triple(rotated, height, width)
             }
-            else -> Triple(data, width, height)
+            else -> {
+                System.arraycopy(src, 0, dst, 0, src.size)
+            }
         }
     }
 
@@ -218,4 +271,3 @@ class BarcodeScannerEngine {
         }
     }
 }
-

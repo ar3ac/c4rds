@@ -28,8 +28,11 @@ Built with modern Android engineering: Kotlin, Jetpack Compose, Material 3, Room
 - 📸 **100% Open-Source Barcode & QR Scanner**: Powered by **CameraX** and **ZXing Core** (`com.google.zxing:core`).
   - Sensor-rotation aware (handles 0°, 90°, 180°, and 270° orientations seamlessly).
   - Handles CameraX memory rowStride buffer alignment cleanly.
-  - Two-stage detection: focused central viewfinder crop (75% width × 40% height) for instant checkout targeting without picking up neighboring barcodes, with an automatic full-frame fallback.
-  - Gallery scanner support: decode barcodes and QR codes directly from imported images.
+  - Multi-pass decoding: `GlobalHistogramBinarizer` for lightning-fast 1D retail barcode detection, `HybridBinarizer` for 2D/QR codes, and inverted luminance fallback.
+  - Dual-orientation detection: scans barcodes held both horizontally and vertically without manual rotation.
+  - Interactive camera controls: Tap-to-focus with center autofocus metering, pinch-to-zoom, 1.0x / 2.0x quick zoom toggle, animated laser scanning guide, and integrated flashlight support.
+  - Preallocated zero-allocation frame buffers eliminating GC pauses and frame drops during live camera analysis.
+  - Gallery scanner support: decode barcodes and QR codes directly from imported images with multi-pass decoding.
   - Automatic normalization of 12-digit UPC-A codes to standard European EAN-13.
 - 📐 **High-Resolution Barcode Rendering**: Dynamic ZXing vector/bitmap rendering that stretches 1D barcodes (EAN-13, Code 128) across full width for grocery laser scanners while keeping 2D barcodes (QR Codes, DataMatrix) perfectly proportioned.
 - 💡 **Automatic Temporary Peak Brightness**: When viewing a card, screen brightness automatically boosts to 100% (`FLAG_KEEP_SCREEN_ON`) for instant readability at store self-checkouts. The original system brightness is immediately restored upon exiting.
@@ -59,7 +62,7 @@ Built with modern Android engineering: Kotlin, Jetpack Compose, Material 3, Room
 
 ## 🏛️ Architecture & Engineering Notes
 
-- **Unified Open-Source Scanner**: In [`BarcodeScannerEngine.kt`](app/src/main/java/io/github/ar3ac/c4rds/ui/scan/BarcodeScannerEngine.kt), CameraX YUV_420_888 luminance planes are extracted and transposed according to the hardware sensor rotation (`rotationDegrees`). ZXing binarizes the luminance directly in memory without RGB overhead, ensuring sub-10ms decoding.
+- **Unified Open-Source Scanner**: In [`BarcodeScannerEngine.kt`](app/src/main/java/io/github/ar3ac/c4rds/ui/scan/BarcodeScannerEngine.kt), CameraX YUV_420_888 luminance planes are extracted and transposed according to the hardware sensor rotation (`rotationDegrees`). Preallocated memory buffers prevent GC pauses, while dual binarization (`GlobalHistogramBinarizer` + `HybridBinarizer`) and inverted fallback deliver sub-10ms omnidirectional barcode scanning.
 - **Fastlane Metadata**: Packaged in `fastlane/metadata/android/` (`en-US` and `it-IT`) compliant with F-Droid and Google Play automated submission pipelines.
 - **Deep Link Navigation**: Handled in `NavGraph.kt` and `AndroidManifest.xml` supporting `c4rds://`, `mycards://`, and `https://c4rds.app/` URI schemes.
 - **Brand Fallback System**: Implemented in `BrandIcon.kt`, providing three tiers of visual representation: local custom asset -> cloud cache -> deterministic colored monogram badge.

@@ -79,6 +79,8 @@
     <string name="scan_viewfinder_hint">Align barcode within the frame</string>
     <string name="scan_from_gallery">Gallery</string>
     <string name="scan_no_barcode_found">No barcode found in the selected image</string>
+    <string name="scan_torch">Flashlight</string>
+    <string name="scan_zoom">Zoom</string>
 
     <!-- Settings & Backup Screen -->
     <string name="settings_title">Settings &amp; Backup</string>

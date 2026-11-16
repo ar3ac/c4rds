@@ -79,6 +79,8 @@
     <string name="scan_viewfinder_hint">Inquadra il codice a barre all\'interno del riquadro</string>
     <string name="scan_from_gallery">Galleria</string>
     <string name="scan_no_barcode_found">Nessun codice a barre trovato nell\'immagine selezionata</string>
+    <string name="scan_torch">Torcia</string>
+    <string name="scan_zoom">Zoom</string>
 
     <!-- Settings & Backup Screen -->
     <string name="settings_title">Impostazioni e Backup</string>
