@@ -3,6 +3,9 @@ package io.github.ar3ac.c4rds.ui.scan
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -40,7 +43,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -180,6 +185,8 @@ fun CameraPreviewWithAnalyzer(
     onBarcodeDetected: (value: String, format: String) -> Unit
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val haptic = LocalHapticFeedback.current
+    val mainHandler = remember { Handler(Looper.getMainLooper()) }
 
     var isDetected by remember { mutableStateOf(false) }
     var activeCamera by remember { mutableStateOf<Camera?>(null) }
@@ -191,7 +198,7 @@ fun CameraPreviewWithAnalyzer(
 
     val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
 
-    // Laser scan line vertical animation
+    // Animated vertical laser scan line
     val infiniteTransition = rememberInfiniteTransition(label = "scanner_laser")
     val laserProgress by infiniteTransition.animateFloat(
         initialValue = 0.05f,
@@ -291,9 +298,16 @@ fun CameraPreviewWithAnalyzer(
                             imageProxy = imageProxy,
                             isAlreadyDetected = isDetected,
                             onSuccess = { rawValue, formatStr ->
-                                if (!isDetected) {
-                                    isDetected = true
-                                    onBarcodeDetected(rawValue, formatStr)
+                                // CRITICAL: Dispatch to Android Main/UI thread for Navigation & Compose state updates
+                                mainHandler.post {
+                                    if (!isDetected) {
+                                        isDetected = true
+                                        try {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        } catch (_: Exception) {}
+                                        Log.d("BarcodeScanner", "Navigating with barcode: $rawValue ($formatStr)")
+                                        onBarcodeDetected(rawValue, formatStr)
+                                    }
                                 }
                             },
                             onComplete = {
@@ -360,7 +374,7 @@ fun CameraPreviewWithAnalyzer(
                 bottom = rectTop + rectHeight
             )
 
-            // Dark semi-transparent scrim around viewfinder box
+            // Scrim
             val scrimPath = Path().apply {
                 addRect(Rect(0f, 0f, canvasWidth, canvasHeight))
                 addRoundRect(
