@@ -1,6 +1,7 @@
 package io.github.ar3ac.c4rds
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -38,7 +39,13 @@ class MainActivity : ComponentActivity() {
                     if (current?.action == Intent.ACTION_VIEW && current.data != null) {
                         val uri = current.data.toString()
                         if (uri.startsWith("content://") || uri.endsWith(".c4rds")) {
-                            navController.navigate(Screen.Settings.createRoute(uri))
+                            navController.navigate(Screen.Settings.createRoute(uri)) {
+                                launchSingleTop = true
+                            }
+                        } else {
+                            // Gestisce i deep link mycards://card/{id}, mycards://add, mycards://create, ecc.
+                            // quando l'activity è già aperta o riceve onNewIntent
+                            navController.handleDeepLink(current)
                         }
                     }
                 }
