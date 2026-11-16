@@ -1,5 +1,6 @@
-- Fully migrated barcode engine to open-source ZXing (F-Droid compliance).
+- Fully migrated barcode engine to 100% open-source ZXing with fast dual-binarization, tap-to-focus, and zero-allocation frame analysis.
 - Android 15 16 KB page size alignment and optimizations.
 - Scan barcodes from gallery images.
-- Added Ko-fi support button.
+- Fixed singleTop deep links and launcher shortcuts navigation.
+- Added flashlight, quick zoom controls, and Ko-fi support button.
 - Complete internationalization (native English & Italian support).

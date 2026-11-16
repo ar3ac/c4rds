@@ -1,5 +1,6 @@
-- Migrazione completa del motore barcode a ZXing 100% open-source (F-Droid ready).
+- Migrazione completa a ZXing 100% open-source con scansione ad alta velocità (doppio binarizzatore), tap-to-focus e zero GC churn.
 - Compatibilità e allineamento pagine 16 KB per Android 15.
 - Scansione barcode e codici QR da immagini in galleria.
-- Aggiunto pulsante di supporto su Ko-fi nelle impostazioni.
+- Correzione navigazione tramite scorciatoie e deep link con app aperta.
+- Aggiunti controlli torcia, zoom rapido e pulsante di supporto Ko-fi.
 - Internazionalizzazione completa (supporto nativo Inglese e Italiano).
