@@ -34,7 +34,12 @@ Built with modern Android engineering: Kotlin, Jetpack Compose, Material 3, Room
   - Preallocated zero-allocation frame buffers eliminating GC pauses and frame drops during live camera analysis.
   - Gallery scanner support: decode barcodes and QR codes directly from imported images with multi-pass decoding.
   - Automatic normalization of 12-digit UPC-A codes to standard European EAN-13.
-- 📐 **High-Resolution Barcode Rendering**: Dynamic ZXing vector/bitmap rendering that stretches 1D barcodes (EAN-13, Code 128) across full width for grocery laser scanners while keeping 2D barcodes (QR Codes, DataMatrix) perfectly proportioned.
+- 📐 **High-Resolution & Zoom-Resistant Barcode Rendering**:
+  - Pixel-perfect 1-bit sharp rendering with nearest-neighbor sampling (`FilterQuality.None`), eliminating bilinear blur and gray edge artifacts.
+  - Aspect-ratio preservation (`ContentScale.Fit`) to prevent bar distortion or squishing.
+  - Full compliance with ISO/IEC and GS1 standards with guaranteed 10-module Quiet Zone margins for 1D retail barcodes (Code 128, EAN-13, UPC).
+  - Adaptive layout for system Display Zoom / Accessibility scaling: dynamically recovers horizontal margin space to ensure barcodes always occupy maximum physical screen width.
+  - Interactive Fullscreen Barcode Dialog with 1-tap 90° rotation to stretch 1D barcodes across the device's longest dimension on stubborn flatbed or laser supermarket scanners.
 - 💡 **Automatic Temporary Peak Brightness**: When viewing a card, screen brightness automatically boosts to 100% (`FLAG_KEEP_SCREEN_ON`) for instant readability at store self-checkouts. The original system brightness is immediately restored upon exiting.
 - ⚡ **Android App Shortcuts (Dynamic & Pinned)**: Long-press the app icon on the Android launcher to access your favorite cards instantly, or pin dedicated 1-tap shortcuts with official store icons directly to your home screen.
 - 🎨 **Modern Material 3 UI & Cloud Logos**: Clean, responsive layout with glassmorphic accents, brand search bar, and custom card reordering. Official store logos are cached locally and synchronized from a public static database (`brands.json`) with procedural color avatar fallbacks.

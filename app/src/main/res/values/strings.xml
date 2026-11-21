@@ -41,6 +41,11 @@
     <string name="delete_card_title">Delete card</string>
     <string name="delete_card_message">Are you sure you want to delete \"%s\"? This action cannot be undone.</string>
     <string name="favorite_max_limit">You can have at most 3 favorite cards for quick shortcuts.</string>
+    <string name="barcode_fullscreen_hint">Tap to enlarge</string>
+    <string name="barcode_fullscreen_title">Full Screen Barcode</string>
+    <string name="barcode_rotate">Rotate 90°</string>
+    <string name="barcode_rotate_hint">Tap barcode to rotate</string>
+    <string name="close">Close</string>
 
     <!-- Add/Edit Screen -->
     <string name="edit_card_title">Edit Card</string>

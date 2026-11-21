@@ -26,15 +26,19 @@ object BarcodeGenerator {
             zxingFormat = BarcodeFormat.EAN_13
         }
 
-        val actualHeight = if (zxingFormat == BarcodeFormat.QR_CODE || zxingFormat == BarcodeFormat.DATA_MATRIX) {
+        val is2D = zxingFormat == BarcodeFormat.QR_CODE || zxingFormat == BarcodeFormat.DATA_MATRIX
+        val actualHeight = if (is2D) {
             width
         } else {
             height
         }
 
         return try {
+            // ISO/IEC and GS1 standards specify a quiet zone of at least 10 modules for 1D barcodes.
+            // For 2D barcodes (QR, Data Matrix), 2-4 modules are standard.
+            val margin = if (is2D) 2 else 10
             val hints = EnumMap<EncodeHintType, Any>(EncodeHintType::class.java).apply {
-                put(EncodeHintType.MARGIN, 2)
+                put(EncodeHintType.MARGIN, margin)
                 put(EncodeHintType.CHARACTER_SET, "UTF-8")
             }
 

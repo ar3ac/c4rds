@@ -41,6 +41,11 @@
     <string name="delete_card_title">Elimina tessera</string>
     <string name="delete_card_message">Sei sicuro di voler eliminare la tessera \"%s\"? L\'azione non può essere annullata.</string>
     <string name="favorite_max_limit">Puoi avere al massimo 3 tessere preferite per i comandi rapidi.</string>
+    <string name="barcode_fullscreen_hint">Tocca per ingrandire</string>
+    <string name="barcode_fullscreen_title">Codice a schermo intero</string>
+    <string name="barcode_rotate">Ruota di 90°</string>
+    <string name="barcode_rotate_hint">Tocca il codice per ruotarlo</string>
+    <string name="close">Chiudi</string>
 
     <!-- Add/Edit Screen -->
     <string name="edit_card_title">Modifica Tessera</string>

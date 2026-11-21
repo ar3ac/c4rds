@@ -53,5 +53,19 @@ class BarcodeFormatTest {
         assertEquals(13, normalizedEan13.length)
         assertTrue(normalizedEan13.startsWith("0"))
     }
+
+    @Test
+    fun testCode128QuietZoneMargin() {
+        val writer = MultiFormatWriter()
+        val hints = java.util.EnumMap<com.google.zxing.EncodeHintType, Any>(com.google.zxing.EncodeHintType::class.java).apply {
+            put(com.google.zxing.EncodeHintType.MARGIN, 10)
+        }
+        // Test with Esselunga style Code 128 barcode
+        val matrix = writer.encode("0401234567890", BarcodeFormat.CODE_128, 400, 100, hints)
+        assertNotNull(matrix)
+        // With quiet zone margin, the first and last columns must be white
+        assertFalse("First pixel column should be white (quiet zone)", matrix.get(0, 50))
+        assertFalse("Last pixel column should be white (quiet zone)", matrix.get(matrix.width - 1, 50))
+    }
 }
 
